@@ -86,8 +86,7 @@ services:
     depends_on:
       n8n-import:
         condition: service_completed_successfully
-    command: n8n start --tunnel  # Add tunnel flag <button class="citation-flag" data-index="1">
-
+    
   qdrant:
     image: qdrant/qdrant
     container_name: qdrant
