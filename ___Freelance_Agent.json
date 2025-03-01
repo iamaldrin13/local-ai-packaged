@@ -1,0 +1,1194 @@
+{
+  "name": "🤖 Freelance Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Goal \nCreate a proposal for freelance jobs\n\n## Pillar Agent\nAnalyze the job description\nCreate custom proposals using tools\n\n### Tools\n1. Proposal template WF\n-Create a proposal based on the job description\n\n2. Generate Mermaid diagram \n\n3. PDF maker WF\n-Create a pdf based on the job description",
+        "height": 420,
+        "width": 1320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -480
+      ],
+      "id": "7669f873-6ec9-4649-9729-5d90d63931ce",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "CV"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        540,
+        360
+      ],
+      "id": "c82fd867-7120-4944-af10-65bac33a943d",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "userdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        760,
+        360
+      ],
+      "id": "970b093c-4bd5-473e-b8ee-208645eec1e5",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Memories\n",
+        "height": 240,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        40
+      ],
+      "id": "645c4746-24cd-4a2b-8f78-82fbd9fa5281",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## User Memories\n",
+        "height": 220,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ],
+      "id": "b0943ed9-259f-4494-b6ce-c14147811a35",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Code3').first().json.jobDescription }}",
+        "options": {
+          "systemMessage": "=You are an expert at crafting compelling cover letters for job applications. Your task is to create a customized cover letter based on the following inputs provided by the user:\n\n1. Cover letter template: {{ $json.agentdata[0].toJsonString() }}\n2. Research about the company: {{ $json.output.toJsonString() }}\n3. Job description: {{ $('Code3').first().json.jobDescription }}\n4. User's CV/resume: {{ $json.userdata[0].toJsonString() }}\n\n## Guidelines:\n\n- Analyze the job description to identify key requirements and qualifications\n- Review the user's CV to highlight relevant skills and experiences that match the job requirements\n- Incorporate company research to demonstrate the applicant's knowledge of and interest in the organization\n- Follow the structure of the provided template (if available)\n- Ensure the tone is professional but personable\n- Keep the cover letter concise (typically 250-400 words)\n- Include specific achievements and metrics where possible\n- Avoid generic statements and clichés\n- Tailor each paragraph to directly address the company's needs\n- End with a strong call to action\n\n## Response Format:\n\nYour response should ONLY contain the completed cover letter. Do not include explanations, additional comments, or ask for further information. The letter should be ready to use without any additional editing.\n\nThe cover letter should typically include:\n- Current date\n- Addressee information (if provided)\n- Professional greeting\n- Opening paragraph introducing the applicant and specifying the position\n- 1-2 paragraphs highlighting relevant qualifications and achievements\n- 1 paragraph expressing interest in the company\n- Closing paragraph with call to action\n- Professional sign-off\n- Applicant's name"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2020,
+        340
+      ],
+      "id": "db1f48a2-7661-48bf-879f-781874459161",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1540,
+        820
+      ],
+      "id": "d042af26-acb2-47ac-ac9e-00dbf59f48ff",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        580
+      ],
+      "id": "992b6a94-b9e3-40e1-b7f5-c98c118fd805",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Freelance Agent"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        540,
+        120
+      ],
+      "id": "3a3191ab-7f53-41c2-b945-0acb48843705",
+      "name": "Notion1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "agentdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_context",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        760,
+        120
+      ],
+      "id": "fc6062e5-3485-4487-80c2-bdfd714932ea",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1320,
+        340
+      ],
+      "id": "fd8cdb5f-d862-4e92-a9ee-4752b457eafe",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data\nconst items = $input.all();\n\n// Process each item in the input\nconst processedItems = items.map(item => {\n    // Extract the article text (assuming it's in a field called 'articles')\n    const originalText = item.json.query || '';\n\n    // Remove all newline characters (\\n) and quotes (\" and ')\n    const cleanedText = originalText.replace(/[\\n\"']/g, '');\n\n    // Return the modified item with the cleaned text\n    return {\n        ...item,\n        json: {\n            ...item.json,\n            articles: cleanedText, // Update the 'articles' field with the cleaned text\n        },\n    };\n});\n\n// Output the processed items\nreturn processedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        1060
+      ],
+      "id": "9957143a-e915-4f31-8cbd-be5ab9962fb6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "puLoO4oWvVXuhyUH",
+          "mode": "list",
+          "cachedResultName": "➖Sub - Job Researcher"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        760,
+        1080
+      ],
+      "id": "5ef32e6a-0f9c-45bb-822a-c3b1748cbd18",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "research",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        980,
+        1080
+      ],
+      "id": "f61cb723-b546-42cc-8b43-20054ba0a1fe",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: Text from previous node\n// Output: Formatted text with proper line breaks and punctuation\n\nfunction formatText(text) {\n  if (!text) return '';\n  \n  let formattedText = text\n    // Replace markdown bold syntax\n    .replace(/\\*\\*/g, '')\n    \n    // Replace escaped newlines with actual newlines\n    .replace(/\\\\n\\\\n/g, '\\n')\n    .replace(/\\\\n/g, '\\n')\n    \n    // Remove apostrophes but keep the words\n    .replace(/'/g, '')\n    \n    // Replace multiple spaces with single space\n    .replace(/\\s+/g, ' ')\n    \n    // Add line break after each numbered item\n    .replace(/(\\d\\.\\s.*?)(?=\\d\\.|\\n|$)/g, '$1\\n')\n    \n    // Add proper spacing after periods followed by words\n    .replace(/\\.(\\w)/g, '. $1')\n    \n    // Add space after colon if missing\n    .replace(/:/g, ': ')\n    \n    // Remove extra spaces after colons\n    .replace(/:\\s+/g, ': ')\n    \n    // Fix spacing around exclamation marks\n    .replace(/\\s*!\\s*/g, '! ')\n    \n    // Preserve email formatting\n    .replace(/\\s*@\\s*/g, '@')\n    .replace(/\\.\\s+com/g, '.com')\n    \n    // Clean up any resulting double spaces\n    .replace(/\\s{2,}/g, ' ')\n    \n    // Trim leading/trailing spaces\n    .trim();\n  \n  return formattedText;\n}\n\n// Get input from previous node\nconst inputText = $input.first().json.output;\n\n// Process the text\nconst cleanedText = formatText(inputText);\n\n// Return the formatted text\nreturn {\n  json: {\n    formattedText: cleanedText\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2380,
+        340
+      ],
+      "id": "16b0ed84-fabe-42b6-9808-c01a0a6ed5f1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c667ec41-ed73-4285-b260-c9928b79a9b1",
+              "name": "plan",
+              "value": "={{ $('Merge2').first().json.research[0].plan }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2640,
+        340
+      ],
+      "id": "58abc076-af5e-40a0-ad7c-9a10a2ea60da",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## Generate Mermaid diagram",
+        "height": 220,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2380,
+        280
+      ],
+      "id": "2a8d0ba0-9c7c-47d6-a7c0-a74a285e3afc",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Generate document proposal\n",
+        "height": 220,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3200,
+        280
+      ],
+      "id": "5416a559-e875-4238-9222-d437aae944cd",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32aa8c22-f4e1-41a5-8d45-791deeb61cbd",
+              "name": "research",
+              "value": "={{ $('Code').item.json.research[0] }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        840
+      ],
+      "id": "67c231d2-d7e2-435d-849b-a091a9366081",
+      "name": "Edit Fields1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Create a research about the job description",
+        "height": 240,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1000
+      ],
+      "id": "cb60959b-3f57-4f50-bfaf-d24a803802fa",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Generate cover letter\n",
+        "height": 220,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        280
+      ],
+      "id": "2af46328-f8ee-499f-8aa6-8736b58f6d95",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "PMZygUqMWVnyVaEQ",
+          "mode": "list",
+          "cachedResultName": "➖Sub Mermaid JS"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        340
+      ],
+      "id": "f15e4df4-52e4-4089-a203-f2ad3b8955ec",
+      "name": "mermaid workflow",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JPs5RAsjAg5F6SIb",
+          "mode": "list",
+          "cachedResultName": "➖Sub Document Proposal"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3100,
+        840
+      ],
+      "id": "ab484c22-3dcc-4bf2-9e42-1190398ae45c",
+      "name": "document proposal workflow",
+      "retryOnFail": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "1a2a83da-9783-8028-987c-c94f0bee9e2b",
+          "mode": "list",
+          "cachedResultName": "Application",
+          "cachedResultUrl": "https://www.notion.so/1a2a83da97838028987cc94f0bee9e2b"
+        },
+        "title": "={{ $('Basic LLM Chain1').item.json.output.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "mermaid|rich_text",
+              "textContent": "={{ $('mermaid workflow').item.json.formattedText }}"
+            },
+            {
+              "key": "applicationStatus|status",
+              "statusValue": "Not started"
+            },
+            {
+              "key": "submissionDate|date",
+              "date": "={{ $now }}",
+              "timezone": "Asia/Manila"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "={{ $('Basic LLM Chain1').item.json.output.title }}"
+            },
+            {
+              "textContent": "={{ $('Basic LLM Chain').item.json.text }}"
+            },
+            {
+              "type": "heading_2",
+              "textContent": "proposal"
+            },
+            {
+              "textContent": "={{ $('AI Agent3').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        4340,
+        340
+      ],
+      "id": "9f0c7eb5-80b9-43ae-a1ca-2e7460ac1497",
+      "name": "Notion2",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Job description:{{ $('Code3').first().json.jobDescription.toJsonString() }}\n\nHere's the variables: {{ $json.output.toJsonString() }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=I'm an automation specialist applying to jobs on freelance platforms.\n\nYour task is to take an input, an Upwork job description and return a customized proposal by replacing the variables in the template using {{ $('Merge').first().json.research.toJsonString() }} which I'll save as a document.\n\nUse the high performing template:\n{{ $('Aggregate4').first().json.agentdata.toJsonString() }}\n\nHere is the user's details:\n{{ $('Merge3').first().json.userdata.toJsonString() }}\n\nReconstruct the template and replace the variables with new data. The output should only be the revised template, do not add other words."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        3500,
+        340
+      ],
+      "id": "a132faa6-950b-430c-85b4-2d0f9a88f952",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        560
+      ],
+      "id": "36e218d0-300d-466e-9d8c-410f782bb367",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Code Node\nconst formatToWordStyle = (items) => {\n  const inputText = $input.first().json.text;\n  \n  // Remove # symbols while preserving the rest of the text\n  let formattedText = inputText.replace(/^#+ /gm, '');\n  \n  // Create the output object\n  const output = {\n    documentContent: formattedText,\n    metadata: {\n      formatVersion: \"1.0\",\n      timestamp: new Date().toISOString()\n    }\n  };\n  \n  return [{json: output}];\n};\n\n// Process items\nreturn formatToWordStyle(items);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4060,
+        340
+      ],
+      "id": "16fe3230-675b-43eb-96f8-9d11f24cbec8",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the job description: {{ $('Code3').first().json.jobDescription.toJsonString() }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Your task is to take an input, an Upwork job description and extract structured data to be used in a high performing template. Be direct with your answer, do not add unnecessary words.\n\n```\n{titleOfSystem}\n{clientName}\n{specificPartOfTheirRequest}\n{briefExplanationOfSystem}\n{stepByStepBulletPoints}\n{leftToRightFlowWithArrows}\n{aboutMe}\n```\n\nHere is the user's details:\n{{ $('Merge').item.json.userdata.toJsonString() }}\n"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        3080,
+        340
+      ],
+      "id": "8bbfa972-1211-47bd-8653-baa071c9c4ce",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"title\": \"titleOfSystem\",\n    \"specificPartOfTheirRequest\":\"specificPartOfTheirRequest\",\n    \"briefExplanationOfSystem\": \"briefExplanationOfSystem\",\n    \"stepByStepBulletPoints\": \"stepByStepBulletPoints\",\n    \"leftToRightFlowWithArrows\": \"leftToRightFlowWithArrows\",\n    \"aboutMe\": \"aboutMe\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3220,
+        560
+      ],
+      "id": "ee26e1d5-655d-4c7e-97f9-556baf5679c9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3040,
+        560
+      ],
+      "id": "e8f421a4-03ad-4a28-991a-9036015fff9d",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=site:https://www.linkedin.com/{{ $json.property_company_name }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Act as a Company Research Analyst. Use the Serper API tool to perform in-depth research on the company provided by the user. Your goal is to extract and synthesize mission, vision, core goals, and key achievements from credible sources.\nInstructions:\n\nInput:\n\nCompany Name: [User-Provided Company Name]\n\nAdditional Context (optional): Industry, region, or specific focus areas.\n\nResearch Process:\n\nStep 1: Query Serper to find the company’s official website, press releases, and verified profiles (e.g., LinkedIn, Crunchbase).\n\nStep 2: Search for:\n\nMission statement (direct quotes from the company’s website or leadership).\n\nVision statement (long-term aspirations).\n\nShort-term and long-term company goals (prioritize recent annual reports or investor materials).\n\nNotable achievements (awards, revenue milestones, product launches, partnerships, CSR initiatives).\n\nStep 3: Cross-reference data from 3+ reputable sources (e.g., Forbes, Bloomberg, BusinessWire) to verify accuracy.\n\nOutput Format:\n\nOrganize findings in structured Markdown with clear headings.\n\nInclude source links for all claims.\n\nHighlight discrepancies if information conflicts across sources.\n\n\n### [Company Name] Research Report  \n**Mission**: [Direct quote or paraphrased mission, with source link]  \n**Vision**: [Summarized vision statement, with source link]  \n**Core Goals**:  \n- Short-term: [Goal 1 + source]  \n- Long-term: [Goal 2 + source]  \n**Key Achievements (Last 3-5 Years)**:  \n- [Achievement 1 with date and source]  \n- [Achievement 2 with date and source]  \n**Additional Insights**:  \n- Industry trends impacting the company (optional).  \n- Leadership quotes or media mentions (if relevant).  \nError Handling:\n\nIf no data is found for a section (e.g., no public mission statement), state: “No publicly available data found for [section].”\n\nFlag outdated information (e.g., goals from >5 years ago with no recent updates)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        560,
+        640
+      ],
+      "id": "30e2359a-fa02-48c2-ada7-79c7a0f160a8",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        520,
+        860
+      ],
+      "id": "73364a08-f6ef-4ca7-8828-c5d9edf23c02",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        860
+      ],
+      "id": "84c5d81a-d9f7-4f7c-8417-60f3bc702f4c",
+      "name": "NotionSerper"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Mission\": \"To revolutionize renewable energy accessibility.\",\n\t\"Vision\": \"A world powered entirely by sustainable tech by 2040.\",\n    \"Short-term Goals\": \"Launch 5 solar farms in Europe by Q4 2024\",\n    \"Long-term Goals\": \"Launch 5 solar farms in Europe by Q4 2024\",\n  \t\"Key Achievements\": \"2023: Partnered with GovTech to build Africa’s largest wind farm\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        860
+      ],
+      "id": "03e6a6b2-7618-4995-acee-1d88d8760de5",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "content": "## Create a research about the job description",
+        "height": 420,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        540
+      ],
+      "id": "b32e6f29-1bc4-468d-82be-1ff8bf047b7b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "1a2a83da-9783-8028-987c-c94f0bee9e2b",
+          "mode": "list",
+          "cachedResultName": "Application",
+          "cachedResultUrl": "https://www.notion.so/1a2a83da97838028987cc94f0bee9e2b"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        20,
+        860
+      ],
+      "id": "6de45b4a-a2cf-4d2b-9dc3-b8f3809641e4",
+      "name": "Notion3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        480
+      ],
+      "id": "e10199ca-00a3-4706-b9df-77dfbc14fa01",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1740,
+        600
+      ],
+      "id": "57f42865-3a0a-4763-b3a4-8e24240cd211",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define the fields you want to include in the jobDescription\nconst selectedFields = ['property_job_description', 'property_responsibilities', 'property_requirements']; // Add your desired fields here\n\n// Get all incoming items\nconst items = $input.all();\n\n// Merge only the selected fields from all inputs into one object\nlet mergedData = {};\nitems.forEach(item => {\n    selectedFields.forEach(field => {\n        if (item.json[field] !== undefined) {\n            mergedData[field] = item.json[field]; // Add the field if it exists\n        }\n    });\n});\n\n// Create the output item with the merged data under the key 'jobDescription'\nreturn [\n    {\n        json: {\n            jobDescription: mergedData\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        1080
+      ],
+      "id": "9df76699-6cee-489d-baac-a940d26eecd8",
+      "name": "Code3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "mermaid workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "document proposal workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mermaid workflow": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "document proposal workflow": {
+      "main": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Notion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "55169969-57ab-4211-bfac-0e45de27f045",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "RyVoDqWM1lzGinj0",
+  "tags": []
+}

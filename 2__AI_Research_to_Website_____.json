@@ -1,0 +1,1280 @@
+{
+  "name": "2. AI Research to Website 🎨📰",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Art Generator\n1. Create a prompt based on provided content \n2. Generate image using Dall-e\n3. Upload the image to baserow so that the link will not expire\n\nWF TUT\nhttps://n8n.io/workflows/2417-flux-ai-image-generator/",
+        "height": 280,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        380,
+        -400
+      ],
+      "id": "57dfd727-fc77-4fbb-bcdf-07e0e906fb42",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1af76e1-6af1-46a4-85b1-75aaef40886c",
+              "name": "=url",
+              "value": "=https://pub-d16d7d90367b44e49faec54388b59854.r2.dev/{{ $json.Key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        800
+      ],
+      "id": "57d941c0-c45c-4685-9547-2adf49d88288",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "LastModified",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        800
+      ],
+      "id": "cdba51e8-1377-49b0-9d26-99638777dfda",
+      "name": "Sort"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        800
+      ],
+      "id": "15825b25-fd0f-4a6b-9db2-4a260a87f59e",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19ea83da-9783-80b5-8058-cdd81ef85b84",
+          "mode": "list",
+          "cachedResultName": "AI Research",
+          "cachedResultUrl": "https://www.notion.so/19ea83da978380b58058cdd81ef85b84"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "statusValue": "For review"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -40,
+        400
+      ],
+      "id": "40f1a6bb-733b-4adc-a3c3-1d27988bdbaa",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        400
+      ],
+      "id": "7ddd60bc-1c7a-4b6a-a58c-30ceae70b952",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.property_image_intro }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate intro"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7db584f6-e331-43c7-809a-3651b432f4ca",
+                    "leftValue": "={{ $json.property_image_sec1 }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate sec1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2331dcfa-958c-497a-b44d-6855f9c6ead2",
+                    "leftValue": "={{ $json.property_image_sec2 }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate sec2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "21ab87d8-cf68-410f-bce0-63973313ff26",
+                    "leftValue": "={{ $json.property_image_sec3 }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate sec3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6207bb8e-3f29-4f39-8279-f8350c628b44",
+                    "leftValue": "={{ $json.property_image_sec4 }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate sec4"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0ec4e8da-457c-4ee5-980e-2e76a85e3f29",
+                    "leftValue": "={{ $json.property_image_conclusion }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generate conclusion"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        340
+      ],
+      "id": "dbd5892a-2432-47b6-913d-bd837b4f94c0",
+      "name": "Switch",
+      "alwaysOutputData": false,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_introduction }}",
+              "type": "string"
+            },
+            {
+              "id": "02e798af-6178-4729-b702-049861c079a0",
+              "name": "",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        0
+      ],
+      "id": "5c84b307-19ff-469f-ab45-60e8437bba19",
+      "name": "Set prompt intro"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_art_prompt_1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        160
+      ],
+      "id": "ddc37ba9-a60e-40a8-b826-7e0d76b058b4",
+      "name": "Set prompt sec1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_art_prompt_2 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        320
+      ],
+      "id": "2b34561a-193d-4148-bcdb-756117c054d9",
+      "name": "Set prompt sec2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_art_prompt_3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        480
+      ],
+      "id": "d717198d-5638-4b57-83a8-3c7038a23209",
+      "name": "Set prompt sec3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_art_prompt_4 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        640
+      ],
+      "id": "3711abf2-f001-4d59-8720-f25138569e47",
+      "name": "Set prompt sec4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "prompt",
+              "value": "={{ $('Notion').first().json.property_image_conclusion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        800
+      ],
+      "id": "bf482b1c-5087-4d0d-9f4c-ccc8b72422e3",
+      "name": "Set prompt conclusion"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image intro|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        0
+      ],
+      "id": "0ca82f72-e5cf-459f-b75b-938c7b089243",
+      "name": "Notion1",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "126f87a0-d336-425f-9afa-6ee3cefdd8e9",
+      "name": "Execute Workflow",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        160
+      ],
+      "id": "184df7ab-7abf-48c6-b691-9b3529e72b06",
+      "name": "Execute Workflow1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        320
+      ],
+      "id": "686a021b-09d4-4794-8146-be13cc93054a",
+      "name": "Execute Workflow2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        480
+      ],
+      "id": "f8aaa81d-a78d-47e3-b425-407fe0603bf1",
+      "name": "Execute Workflow3",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        640
+      ],
+      "id": "960efb9c-2040-4497-b242-79ed98ca96d9",
+      "name": "Execute Workflow4",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "EVJGXaHPpv78tQ0Q",
+          "mode": "list",
+          "cachedResultName": "🎨 Content art gen 🤖"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        800
+      ],
+      "id": "a4f1eb70-ccad-42f5-ab03-62866300a4cf",
+      "name": "Execute Workflow5",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image sec1|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        160
+      ],
+      "id": "1fd2c988-7989-45bd-81cc-d611e7372468",
+      "name": "Notion2",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image sec2|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        320
+      ],
+      "id": "85320e2c-2b2c-48eb-ad95-9cf06a40f5d5",
+      "name": "Notion3",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image sec3|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        480
+      ],
+      "id": "cf8308da-3c83-4f7d-9d4e-e12d53aeeb4e",
+      "name": "Notion4",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image sec4|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        640
+      ],
+      "id": "d2ab5514-c0e5-4114-a3c6-b89686279a77",
+      "name": "Notion5",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').first().json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "image conclusion|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "ai",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Status|status",
+              "statusValue": "Published"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        800
+      ],
+      "id": "fefa6f5c-17d2-408c-af3e-94f672658611",
+      "name": "Notion6",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-800e-b7f2-f34cc1ac255d",
+          "mode": "list",
+          "cachedResultName": "Trending in web3!",
+          "cachedResultUrl": "https://www.notion.so/19da83da9783800eb7f2f34cc1ac255d"
+        },
+        "title": "={{ $('Notion').item.json.property_title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "status|select",
+              "selectValue": "Draft"
+            },
+            {
+              "key": "type|select",
+              "selectValue": "Post"
+            },
+            {
+              "key": "category|select",
+              "selectValue": "Article"
+            },
+            {
+              "key": "slug|rich_text",
+              "textContent": "={{ $json.property_slug }}"
+            },
+            {
+              "key": "date|date",
+              "date": "={{ $now }}",
+              "timezone": "Asia/Manila"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.property_introduction }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $json.property_image_sec1[0] }}"
+            },
+            {
+              "textContent": "={{ $json.property_section_1 }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $json.property_image_sec2[0] }}"
+            },
+            {
+              "textContent": "={{ $json.property_section_2 }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $json.property_image_sec3[0] }}"
+            },
+            {
+              "textContent": "={{ $json.property_section_3 }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $json.property_image_sec4[0] }}"
+            },
+            {
+              "textContent": "={{ $json.property_section_4 }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $json.property_image_conclusion[0] }}"
+            },
+            {
+              "textContent": "={{ $json.property_conclusion }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1620,
+        800
+      ],
+      "id": "3368b98f-6ac4-4903-a17e-4c8cdd3e6721",
+      "name": "Create AI content",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/pages/{{ $json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "cover",
+              "value": "={{\n  {\n    \"type\": \"external\",\n    \"external\": {\n      \"url\": $('Notion6').item.json.property_image_intro[0]\n    }\n}\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "27b4c64d-2e9a-45b8-af7d-9a36010b34b6",
+      "name": "Update page cover",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1880,
+        800
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Generate socmed, call sub workflow\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        660
+      ],
+      "id": "f3ec82d9-f651-4709-86ea-d98904b88218",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Set prompt intro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set prompt sec1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set prompt sec2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set prompt sec3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set prompt sec4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set prompt conclusion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt intro": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt sec1": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt sec2": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt sec3": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt sec4": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set prompt conclusion": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow1": {
+      "main": [
+        [
+          {
+            "node": "Notion2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow2": {
+      "main": [
+        [
+          {
+            "node": "Notion3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow3": {
+      "main": [
+        [
+          {
+            "node": "Notion4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow4": {
+      "main": [
+        [
+          {
+            "node": "Notion5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow5": {
+      "main": [
+        [
+          {
+            "node": "Notion6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion6": {
+      "main": [
+        [
+          {
+            "node": "Create AI content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create AI content": {
+      "main": [
+        [
+          {
+            "node": "Update page cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9e4acf37-8901-49b6-8243-e5ff19499abe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "TMotXwUZYnh8upB0",
+  "tags": [
+    {
+      "createdAt": "2025-02-25T09:01:15.005Z",
+      "updatedAt": "2025-02-25T09:01:15.005Z",
+      "id": "K6iU7qOg1TpAvwBe",
+      "name": "art"
+    },
+    {
+      "createdAt": "2025-02-21T05:41:24.820Z",
+      "updatedAt": "2025-02-21T05:41:24.820Z",
+      "id": "yiCETBmgPvdWFuiK",
+      "name": "notion"
+    }
+  ]
+}

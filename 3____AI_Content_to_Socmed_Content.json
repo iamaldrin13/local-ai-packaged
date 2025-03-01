@@ -1,0 +1,527 @@
+{
+  "name": "3. ✨ AI Content to Socmed Content",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Create a prompt for Image creation, process it with Dall-E",
+        "height": 300,
+        "width": 540,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        420
+      ],
+      "id": "37f11f50-13b2-4cfd-a02b-0ff0955ea247",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow\nRetrieve article and SEO fields from Source DB in Notion\n\n1. Create Summary for generating title and image prompt\n2. Create Title\n3. Generate Image\n4. Create Social Media Articles\n5. Upload content to AI Content Database in Notion\n\nSource and end point in Notion is different for better organization\n\nThings to add:\nAI assistant \nTG updates\nReels creation\nReels posting\nImprove AI prompts for creating articles, separate for each social media\nNotion article needs to be longer\n\nCreate social media content direct from the article and not the summary\n",
+        "height": 440,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -460,
+        340
+      ],
+      "id": "56142073-e98e-4dfa-a263-7e29dc82859d",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Create articles for social media\n",
+        "height": 560,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        420
+      ],
+      "id": "fada54f2-70a8-4997-b7f2-5f9a435a82dc",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Upload in Notion, SocMed \nAI Content DB",
+        "height": 300,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        420
+      ],
+      "id": "6ac24a15-b6b2-4e10-ab76-6f2792002a29",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Send a message to the user about the new content for review\n",
+        "height": 300,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        420
+      ],
+      "id": "0796b6ee-62a9-4156-8657-526a8d823443",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Article entry for Social media created!\n\n{{ $json.name }}\n{{ $json.url }}\n\nFB: \n{{ $('Source to AI Content SocMed').item.json.property_fb_post }}\n\nIG:\n{{ $('Source to AI Content SocMed').item.json.property_ig_post }}\n\nTwitter:\n{{ $('Source to AI Content SocMed').item.json.property_twitter_post }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2460,
+        540
+      ],
+      "id": "942ed89a-01c0-4132-aa86-d1996318d916",
+      "name": "Telegram",
+      "webhookId": "f8452d85-6bed-451c-8945-126e27654f09",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"Facebook\": \"[SEO-optimized content]\",\n    \"Story\": \"[Engaging content]\",\n    \"Twitter\": \"[SEO-optimized content with hashtags]\",\n    \"Instagram\": \"[SEO-optimized content with hashtags]\"\n\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        740
+      ],
+      "id": "7a5bcbdd-c156-41dc-9a80-62b9a33f41a6",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article Content:{{ $json.property_content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an experienced social media content specialist with 10 years of expertise in crafting high-engagement content for leading brands. Your role is to help create compelling social media copy while maintaining authenticity and responsible communication practices. Article link is provided.\n\n  Core Expertise & Background\nYou have managed social media campaigns for major brands across Web3, tech, lifestyle, and entertainment sectors, with specialized experience in creating engaging content that translates across both traditional social media and long-form platforms. Your expertise spans Twitter, Instagram, and Facebook, with a deep understanding of how to adapt messaging for each platform's unique audience and requirements.\n\n\n  Content Creation Rules\n- Balance promotional content with community building (80/20 rule)\n- Utilize native features for each platform\n- Optimize preview links with compelling metadata\n- Create content that encourages meaningful interactions\n- Include questions that triggers engagement and hype\n- Focus on shareable content that drives conversations\n- If there's a mention of an airdrop, tokens, or play to earn include relevant hashtags\n- Always create content from a 3rd person perspective, not as an affiliate, partner or employee of the project\n\n\n  Content Creation Process\n\nFacebook\nCharacter Limits:\n- Posts: 63,206 characters\n- Event descriptions: 1,000 characters\n- Comments: 8,000 characters\n\nPost Strategy:\n\n- Maintain 1-2 paragraphs for optimal engagement\n- Use 2-3 highly relevant hashtags maximum\n- Place hashtags at the end of the post\n- Include one emoji in the opening line when appropriate\n- Create clear paragraph breaks for readability\n\n\n\nExample Format:\n\"Revolutionizing the future of finance ⚡\n\nJoin us for an exclusive look at [Project Name]'s groundbreaking protocol. Early access opens tomorrow at 9 AM UTC.\n\n\n#Web3 #Blockchain #DeFi\"\n\nstory Post Best Practices:\n- Write clear, concise headlines\n- Use the first 3 lines to hook readers\n- Include call-to-action in visible text\n- Tag relevant partners when appropriate\n\n  Twitter (X)\nCharacter Limit: 280 characters\n- Use 1-2 relevant hashtags maximum per tweet\n- Place hashtags naturally within sentences when possible\n- Add one contextual emoji at the start or end of tweets when appropriate\n- Use $cashtags for token/coin mentions\n- Avoid special characters except # and $\n\nExample Format:\nContent :\"Excited to announce our latest milestone 🚀 Join us for the reveal of #ProjectName $TOKEN\"\n\n  Instagram\nCharacter Limit: 2,200 characters\n- Use 3-5 relevant hashtags\n- Place one strategic emoji in the first line for visibility\n- Create line breaks between paragraphs\n- Use periods (.) for spacing when needed\n\nExample Format:\n\"Ready to revolutionize DeFi? ⚡\nOur new protocol launches tomorrow.\n\nDon't miss your chance to be early.\n\n#Web3 #DeFi #Crypto #Blockchain #Innovation\"\n\n  Content Creation Rules\n\n1. Hashtag Usage:\n   - Research trending and relevant hashtags before posting\n   - Use industry-standard hashtags\n   - Avoid overused or spam-associated tags\n   - Place hashtags strategically based on platform\n   - Adapt hashtag density for each platform's best practices\n\n2. Emoji Guidelines:\n   - Use one emoji per post maximum\n   - Select emojis that match professional context\n   - Common approved emojis: 🚀 ⚡ 🎯 🔔 ✨ 💫\n   - Place emojis at post beginning or end\n   - Avoid emoji clusters\n\n3. Special Characters:\n   - Only use # for hashtags\n   - Only use $ for tokens/tickers\n   - Avoid fancy fonts or unicode characters\n   - Use standard punctuation\n\n\n  Platform-Specific Content Strategy\n\n  Short-Form Content (Twitter, TikTok, Instagram):\n- Focus on immediate value and hook within first line\n- Create curiosity gaps that encourage engagement\n- Use platform-native features (polls, stickers, sounds)\n- Optimize posting times for each platform\n- Craft content that encourages sharing and saves\n\n  Long-Form Content (Notion Blog):\n- Start with a compelling hook\n- Break down complex topics into digestible sections\n- Use data and research to support claims\n- Include clear calls-to-action\n- Optimize for search engine visibility\n- Create content series for continued engagement\n\n  Engagement Principles\n- Focus on creating genuine value and fostering real community connections\n- Highlight unique project benefits while maintaining realistic expectations\n- Use FOMO (Fear of Missing Out) responsibly - emphasize opportunities without manipulation\n- Encourage participation through inclusive language and community-focused messaging\n- Balance hype with substance - always provide concrete information and value\n\n  Ethical Guidelines\n- Never make unrealistic promises or guarantees about returns or outcomes\n- Maintain transparency about promotional content\n- Avoid manipulative tactics or artificial scarcity\n- Focus on building sustainable, long-term community engagement\n- Respect platform-specific rules and guidelines\n- Always promote responsible participation in Web3 projects\n\n  Content Creation Process\n1. Identify target platform and apply relevant character limits and formatting\n2. Review brand guidelines and project goals\n3. Select appropriate hashtags based on platform guidelines\n4. Choose one strategic emoji if appropriate for the message\n5. Craft content following platform-specific best practices\n6. Review for compliance with special character restrictions\n7. Provide rationale for strategic choices\n8. Cross-platform coordination:\n   - Ensure consistent messaging across platforms\n   - Adapt content format for each platform\n   - Maintain synchronized timing for major announcements\n\nRemember to:\n- Stay updated on platform trends and best practices\n- Adapt tone and style to match brand voice while maintaining energy\n- Focus on building genuine community engagement\n- Balance excitement with responsibility\n- Provide clear, actionable next steps for audience participation\n- Only use relevant, trending, and popular hashtags\n- Optimize it for SEO\n\nProvide the output in separate sections for each platform.\n\nBe consistent and maintain structured schema for each social media platform:\nFacebook/content\nstory/content\nTwitter/content\nInstagram/content\n\nArticle : {{ $json.Notion }}"
+        }
+      },
+      "id": "9d64db06-01c0-4c3c-bb4f-24809a2533c3",
+      "name": "Social Media",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        680,
+        540
+      ],
+      "retryOnFail": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "content": "## Cron trigger for checking AI Content DB for new published articles. \n\nPublished articles will have website links to be attached to social media posts. ",
+        "height": 540,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        340
+      ],
+      "id": "6af0d866-15ca-4efb-9a27-e3b5a182d5bd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf05c351-c8f8-480b-ab9d-e149ae4db249",
+              "name": "content",
+              "value": "={{ $('Notion1').first().json.property_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        540
+      ],
+      "id": "28acec94-0f8b-42fe-a0e4-0e3c55e3d2f9",
+      "name": "Set content"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "awgrTVoEqWZMI3ZT",
+          "mode": "list",
+          "cachedResultName": "🎨 Art Generator 🤖 HuggingFace"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        540
+      ],
+      "id": "b4cedd7a-be2f-4de6-ac3b-6a4b19f7f287",
+      "name": "Call Art Generator WF"
+    },
+    {
+      "parameters": {
+        "content": "## CHANGE STRUCTURE\n\n1. Create own DB for other social media\n2. Only generate once Notion entry is posted\n3. Attach Notion link to all social media post to redirect people to the full article\n\n\nRSS feed - Source update > Notion post > Social media content\n      ",
+        "height": 1020,
+        "width": 2420,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        200
+      ],
+      "id": "a88544fb-4ede-4443-b89b-5c87cc9c4920",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "18ca83da-9783-8039-baab-ecb1d3e45cc6",
+          "mode": "list",
+          "cachedResultName": "AI Content SocMed",
+          "cachedResultUrl": "https://www.notion.so/18ca83da97838039baabecb1d3e45cc6"
+        },
+        "title": "={{ $('Notion1').item.json.property_title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "FB Post|rich_text",
+              "textContent": "={{ $('Social Media').item.json.output.Facebook }}"
+            },
+            {
+              "key": "FB Story|rich_text",
+              "textContent": "={{ $('Social Media').item.json.output['Story'] }}"
+            },
+            {
+              "key": "Twitter Post|rich_text",
+              "textContent": "={{ $('Social Media').item.json.output.Twitter }}"
+            },
+            {
+              "key": "IG Post|rich_text",
+              "textContent": "={{ $('Social Media').item.json.output.Instagram }}"
+            },
+            {
+              "key": "image|files",
+              "fileUrls": {
+                "fileUrl": [
+                  {
+                    "name": "AI",
+                    "url": "={{ $json.url }}"
+                  }
+                ]
+              }
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "🔍In Review"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1860,
+        540
+      ],
+      "id": "5d1dc628-3b9f-46b9-931c-1a643b4fcd83",
+      "name": "Source to AI Content SocMed",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-lite-preview-02-05:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        640,
+        780
+      ],
+      "id": "0bcf30a8-87bb-4d13-882e-4cee822f3b7c",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=30 */2 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        40,
+        640
+      ],
+      "id": "11587ccb-affa-41f8-a085-32861f4ef2b6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-800e-b7f2-f34cc1ac255d",
+          "mode": "list",
+          "cachedResultName": "Trending in web3!",
+          "cachedResultUrl": "https://www.notion.so/19da83da9783800eb7f2f34cc1ac255d"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "status|select",
+              "condition": "equals",
+              "selectValue": "Draft"
+            },
+            {
+              "key": "type|select",
+              "condition": "equals",
+              "selectValue": "Post"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "date|date",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        640
+      ],
+      "id": "b2709acb-08e4-4910-80ac-e8f9ba62332a",
+      "name": "Notion1",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion1').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "status|select",
+              "selectValue": "Published"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2100,
+        540
+      ],
+      "id": "308e4863-8bf8-478d-91e0-7ab10307c794",
+      "name": "Update AI Content",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Social Media",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Social Media": {
+      "main": [
+        [
+          {
+            "node": "Set content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set content": {
+      "main": [
+        [
+          {
+            "node": "Call Art Generator WF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Art Generator WF": {
+      "main": [
+        [
+          {
+            "node": "Source to AI Content SocMed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source to AI Content SocMed": {
+      "main": [
+        [
+          {
+            "node": "Update AI Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Social Media",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Social Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update AI Content": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "56d7d25d-6171-4c12-8b84-0d41156dd794",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "402zltyJMmZLWG2X",
+  "tags": []
+}

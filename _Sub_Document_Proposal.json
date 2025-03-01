@@ -1,0 +1,391 @@
+{
+  "name": "➖Sub Document Proposal",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        760,
+        120
+      ],
+      "id": "5bcc37ca-83e2-4bf1-9e90-33f810da29e3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "CV"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -460,
+        200
+      ],
+      "id": "7eb37f6d-8d20-4111-bd6d-637b846a2cec",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "userdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        200
+      ],
+      "id": "2bac5ce4-6e77-4819-a1f3-f6f7fcba56ca",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -240
+      ],
+      "id": "aeb0ac01-00af-4841-b236-185851a7b3c0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## User Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        100
+      ],
+      "id": "9ceea870-a276-4746-a205-a20c95dda3e5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -40,
+        60
+      ],
+      "id": "6deba3dd-63cf-40b7-80d1-dd345ec34fb4",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        980,
+        440
+      ],
+      "id": "70f94ba6-a3d3-465f-81b5-2a66b55dadab",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Freelance Agent"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -460,
+        -160
+      ],
+      "id": "067a0056-5cc9-4e29-b76a-c89306784219",
+      "name": "Notion1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "agentdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_context",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -160
+      ],
+      "id": "77385305-0f63-44d2-9e2a-85b9a33941f2",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        160,
+        -40
+      ],
+      "id": "2d5a86a3-6e04-42ac-a078-995b2d2db966",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"titleOfSystems\": \"Social media marketing automation\",\n\t\"briefExplanationOfSystem\": \"explain the workflow concisely\",\n    \"specificPartOfTheirRequest\": \"We need social media marketer.\",\n\t\"stepByStepBulletPoints\": [\"request 1, request 2\"],\n    \"leftToRightFlowWithArrows\": \"analyze requirement->design workflow->goal\",\n\t\"aboutMeBulletPoints\": [\"Can adapt, Works under pressure\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1300,
+        440
+      ],
+      "id": "3256b442-f86b-475f-bd7f-174330b8bd91",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=I'm an automation specialist applying to jobs on freelance platforms.\n\nYour task is to take an input, an Upwork job description and return a JSON output for a customized proposal which I'll save as a document.\n\nUse the high performing template:\n{{ $json.agentdata.toJsonString() }}\n\nHere is the job description:\n{{ $json.query }}\n\nHere is the user's details:\n{{ $json.userdata.toJsonString() }}\n\nReconstruct the template and replace the variables with new data."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1040,
+        120
+      ],
+      "id": "4ae9c1ff-95bd-49f3-ae0e-14322e417c02",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "content": "## Create a document, upload it to the cloud"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -180
+      ],
+      "id": "4f20dee5-872f-45d8-a527-d8301d00dbe3",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "67690247-0f19-4697-a0d1-393d323b2022",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "JPs5RAsjAg5F6SIb",
+  "tags": []
+}

@@ -1,0 +1,973 @@
+{
+  "name": "➖Sub 🤖🏗️Content Researcher V1.1",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Create an article based on the 8 steps of research\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        60
+      ],
+      "id": "214126f1-f180-4551-87ab-bcead012bd58",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"Step 1\": \"Define the Article Topic\",\n    \"title\": \"Attention catching title\",\n    \"slug\": \"unique-identifying-part-of-a-web-address\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        340
+      ],
+      "id": "0413b4a7-aa67-45f2-9d63-5d57a200a522",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        2120,
+        920
+      ],
+      "id": "d320d027-90c7-4d85-a47a-e83a3f4d6b01",
+      "name": "NotionSerper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        920
+      ],
+      "id": "8f584c14-3e4e-43e1-82d5-517247b5b8e5",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Purpose\n• Generate a clear, focused article topic that avoids vague terminology\n• Ensure specificity and measurable outcomes\n• Create an attention-grabbing, accurate title that drives engagement\n\nPrompt Template (Topic)\n\"As a content strategist, help me create a focused topic for an article about {{ $json.content }}. The topic should address a specific problem or opportunity, avoiding generic terms like 'tips' or 'guide'. Format as a single clear sentence.\"\n\nPrompt Template (Title)\n\"As a copywriter, create a compelling title and a slug for an article about {{ $json.content }}. The title should:\n• Lead with a clear benefit or solution\n• Include specific context or application\n• Add credibility markers when relevant\n• Use strong action words\n• Avoid clickbait tactics\n• Name specific methods or approaches\n• Appeal to professional audience needs\"\nExample\nTopic: Instead of \"A guide to productivity\" use \"How remote workers can achieve deep focus during high-energy hours using the Pomodoro Technique\"\nTitle: \"How to Master Deep Work From Home: The Science-Backed Pomodoro Method\"\nSlug: \"master-deep-work-from-home\""
+        }
+      },
+      "id": "491567ff-8728-4f0c-860f-ac1bef693236",
+      "name": "Step 1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        140,
+        220
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=### Purpose\n- Create detailed audience persona\n- Align content with reader needs\n\n### Prompt Template\n\"Acting as a market research analyst, identify the target audience for an article titled {{ $json.content }}. Provide a 50-word description including their age range, professional background, key interests, and primary challenges they face with this topic.\"\n\n### Example\nTarget Reader: \"Tech-savvy professionals aged 25-40 working remotely in knowledge-based industries. They struggle with maintaining productivity amid digital distractions and seek evidence-based methods to improve their work efficiency while maintaining work-life balance.\"\n"
+        }
+      },
+      "id": "4cb9cd01-04dc-4d98-bc19-7e1146e9783d",
+      "name": "Step 2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        140,
+        440
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Purpose\n- Identify high-impact search terms\n- Balance search volume with relevance\n\n### Prompt Template\n\"As an SEO specialist, suggest 10-15 strategic keywords for an article targeting {{ $('Step 2').item.json.output['Target Audience'][0] }} about {{ $('Step 1').item.json.output['Step 1'] }}. Include a mix of primary keywords, long-tail phrases, and related terms that show strong search intent. Present in order of priority.\""
+        }
+      },
+      "id": "7b6749be-a854-4ac3-9244-e1fbb3642d2f",
+      "name": "Step 3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1120,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Purpose\n- Create logical content flow\n- Incorporate keywords naturally\n- End with clear call-to-action\n\n### Prompt Template\n\"As a content architect, create a detailed outline for . Include 5 main sections with 3 subsections each, naturally incorporating these keywords: {{ $json.output['SEO Keywords'] }}. Conclude with a compelling call-to-action section.\"\n"
+        }
+      },
+      "id": "160f1fbe-3a29-41ff-a271-4cd69e337138",
+      "name": "Step 4",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1500,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Purpose\n- Produce engaging, keyword-rich content\n- Maintain consistent tone and style\n\n### Prompt Template\n\"As an expert writer in [subject area], create a 1000-word article following this outline {{ $json.output.toJsonString() }}. Maintain a Professional web3 degen voice suitable for {{ $('Step 2').item.json.output['Target Audience'] }} . Integrate these keywords naturally: {{ $('Step 3').item.json.output['SEO Keywords'] }}. Emphasize practical application and real-world examples.\""
+        }
+      },
+      "id": "23209da2-6080-4432-9408-b2459ffe42cf",
+      "name": "Step 5",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2300,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Visual Content Strategist with access to visual trend analysis, based on each section, suggest visual elements to enhance it. Use your memory tool to identify available visual styles, formats, and trends that resonate with the provided data. For each suggestion, provide a detailed prompt for an AI art generator that specifies style, composition, subject matter, mood, lighting, and color palette. Your recommendations should be based from the Memory tool provided, follow visual design principles that enhance content comprehension and emotional impact, informed by current industry visual standards.\nThe only output will be different prompts for art generation. No other words needed.\n\nPrompt 1: {{ $('Wait1').item.json.output.Introduction }}\nPrompt 2: {{ $('Wait1').item.json.output['section 1'] }}\nPrompt 3: {{ $('Wait1').item.json.output['section 2'] }}\nPrompt 4: {{ $('Wait1').item.json.output['section 3'] }}\nPrompt 5: {{ $('Wait1').item.json.output['section 4'] }}\nPrompt 6: {{ $('Wait1').item.json.output.Conclusion }}"
+        }
+      },
+      "id": "2214e94e-9417-4f32-96a6-91e661cf1230",
+      "name": "Step 6",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2800,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Step 5').item.json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=###Purpose\nPolish content for publication\nEnsure SEO optimization\nRemove AI artifacts\n\n###Prompt Template\nAs a professional editor, review each draft for clarity, engagement, and SEO effectiveness. Remove any special characters (* # -) typical of AI outputs, ensure natural keyword placement, and maintain consistent formatting. Article is mostly about web3, cryptocurrencies, tokens, and web3 games.\n\n###Quality Checklist\nRefrain from repeating project name\nGrammar and style consistency\nKeyword integration\nClear paragraph transitions\nCompelling call-to-action\nClean formatting (no special characters)\nMobile-friendly structure\nIncorporate social links from research if available\n\nDo not add headers. \n    \"Revised section 1\": \"Introduction\",\n\t\"Revised section 2\": \"Section 1\",\n    \"Revised section 3\": \"Section 2\",\n    \"Revised section 4\": \"Section 3\",\n    \"Revised section 5\": \"Section 4\",\n    \"Revised section 6\": \"Conclusion\""
+        }
+      },
+      "id": "5061faed-5797-4069-9147-7b70cd1fd710",
+      "name": "Step 7",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3500,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Target Audience\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        560
+      ],
+      "id": "b725452c-3b8f-4058-a73d-ca3bc71b8923",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"SEO Keywords\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        440,
+        780
+      ],
+      "id": "5b005516-1ec8-444d-a548-7f4ae107c90b",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Introduction\": \"attention-grabbing introduction\",\n    \"section 1\": \"Overview\",\n    \"section 2\": \"Introduction \",\n    \"section 3\": \"Key Features\",\n    \"section 4\": \"Concept \",\n    \"Conclusion\": \"compelling conclusion\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1700,
+        440
+      ],
+      "id": "74500164-4f32-4a77-8448-426f1034db9c",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "content": "## Needs Step 2 and Step 3 results\n\nCreate the outline\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        80
+      ],
+      "id": "64361de8-f451-40db-a2fd-d8bf4f9bf76e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Step 5 needs the article outline from Step 4\n\nWrite the article\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        80
+      ],
+      "id": "8a5b81b3-5bc4-4a4c-996f-add59f829d09",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Step 1 - Define the Article Topic\nStep 2 - Target Audience\nStep 3 - SEO Keywords"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        60
+      ],
+      "id": "760ab806-9d63-47bb-a949-b39c16153cd2",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Section 1\": \"Introduction\",\n\t\"Section 2\": \"Gameplay Mechanics\",\n    \"Section 3\": \"Technical Innovation\",\n    \"Section 4\": \"Community & Economy\",\n    \"Section 5\": \"Future Vision\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2560,
+        440
+      ],
+      "id": "f32acb6a-5903-4e95-b82a-8b0b59ea51e1",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "content": "## Step 6 creates the image prompt based on the article segmentation",
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2780,
+        80
+      ],
+      "id": "b04a7c40-4988-4523-88cc-bf7b12052e6c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Art 1\": \"Prompt 1\",\n\t\"Art 2\": \"Prompt 2\",\n    \"Art 3\": \"Prompt 3\",\n    \"Art 4\": \"Prompt 4\",\n    \"Art 5\": \"Prompt 5\",\n    \"Art 6\": \"Prompt 6\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3060,
+        440
+      ],
+      "id": "77f288b1-1f8f-4f8a-b743-f9270f2ada6c",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "content": "## Step 7 Final Review",
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3260,
+        80
+      ],
+      "id": "8811374b-de48-4cb7-b68a-8e02d17758dc",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Introduction\": \"Introduction\",\n\t\"Section 1\": \"Section 1\",\n    \"Section 2\": \"Section 2\",\n    \"Section 3\": \"Section 3\",\n    \"Section 4\": \"Section 4\",\n    \"Conclusion\": \"Conclusion\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3720,
+        440
+      ],
+      "id": "bf4fd4a3-ceac-4ed2-8a6a-582b1cbabfcb",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        640,
+        300
+      ],
+      "id": "1d8ffedc-8f9b-4a46-ada7-43b60dca4091",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Memory tool for creating art prompts",
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Art"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        2900,
+        700
+      ],
+      "id": "435c6181-6c33-400d-99da-5aaea37346af",
+      "name": "Memory Tool",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "19ea83da-9783-80b5-8058-cdd81ef85b84",
+          "mode": "list",
+          "cachedResultName": "AI Research",
+          "cachedResultUrl": "https://www.notion.so/19ea83da978380b58058cdd81ef85b84"
+        },
+        "title": "={{ $('Merge1').item.json.output.title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Art Prompt 1|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 1'] }}"
+            },
+            {
+              "key": "Art Prompt 2|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 2'] }}"
+            },
+            {
+              "key": "Art Prompt 3|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 3'] }}"
+            },
+            {
+              "key": "Art Prompt 4|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 4'] }}"
+            },
+            {
+              "key": "Art Prompt 5|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 5'] }}"
+            },
+            {
+              "key": "Art Prompt 6|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 6'] }}"
+            },
+            {
+              "key": "Section 1|rich_text",
+              "textContent": "={{ $json.output['Section 1'] }}"
+            },
+            {
+              "key": "Section 2|rich_text",
+              "textContent": "={{ $json.output['Section 2'] }}"
+            },
+            {
+              "key": "Section 3|rich_text",
+              "textContent": "={{ $json.output['Section 3'] }}"
+            },
+            {
+              "key": "Section 4|rich_text",
+              "textContent": "={{ $json.output['Section 4'] }}"
+            },
+            {
+              "key": "Introduction|rich_text",
+              "textContent": "={{ $json.output.Introduction }}"
+            },
+            {
+              "key": "Conclusion|rich_text",
+              "textContent": "={{ $json.output.Conclusion }}"
+            },
+            {
+              "key": "slug|rich_text",
+              "textContent": "={{ $('Merge1').item.json.output.slug }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3860,
+        300
+      ],
+      "id": "a4e483bd-1076-4dca-bb9f-2d808efb34cd",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "In Progress. \nTODO\nFix Step 6\nUpload to notion"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3980,
+        240
+      ],
+      "id": "a2855caf-d2fe-4aa4-9b8c-d767670682a3",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "657738d0-92cf-43f9-9f99-c74957e96048",
+              "name": "content",
+              "value": "={{ $json.content || $json.summary}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        380
+      ],
+      "id": "150d8fb6-cf65-446f-af3d-0e187018db96",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        860,
+        300
+      ],
+      "id": "4af9e8a7-6e72-43d1-8db5-b09d41a851a8",
+      "name": "Wait",
+      "webhookId": "2f4bd88d-257d-476a-a82a-2eb3d847335c"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1820,
+        300
+      ],
+      "id": "d69bcf1a-f482-42c1-993d-2da3e210ca45",
+      "name": "Wait1",
+      "webhookId": "9ae52328-5ce7-482c-aedb-7b986806f4db"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3240,
+        300
+      ],
+      "id": "1b0094d6-135c-4a7a-8619-d14486e4e505",
+      "name": "Wait2",
+      "webhookId": "874d7be1-f3c9-4222-bfc7-d0c4a04af71e"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -780,
+        280
+      ],
+      "id": "68766712-47b9-43a9-99f5-53f8f73b5b8d",
+      "name": "Telegram Trigger",
+      "webhookId": "56c2b54e-588f-456a-8472-7055c2d24b38",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -780,
+        440
+      ],
+      "id": "53289c14-0372-4740-9e05-a9a8a0415d66",
+      "name": "When chat message received",
+      "webhookId": "a00a7ace-7174-47df-9465-a2fbfc1cc915"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -780,
+        640
+      ],
+      "id": "8f9739bb-a409-494a-8ac8-91aefc1d7713",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 3",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 4",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 6",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 7",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 3",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 4",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 5",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 6",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Step 3": {
+      "main": [
+        [
+          {
+            "node": "Step 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 4": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 5": {
+      "main": [
+        [
+          {
+            "node": "Step 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 6": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 7": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 3",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 4",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 5",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 6",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 7",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 6",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Step 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Step 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Step 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Step 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "58fe354e-17f9-41dc-a947-2defbed22da4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "qs7vjEZg5ZFBBMmd",
+  "tags": []
+}

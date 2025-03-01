@@ -1,0 +1,465 @@
+{
+  "name": "🎨 Art Generator 🤖 HuggingFace",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        380
+      ],
+      "id": "92152571-ee65-4c8c-84ae-080969d8b8c1",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Art Generator\n1. Create a prompt based on provided content \n2. Generate image using Dall-e\n3. Upload the image to baserow so that the link will not expire\n\nWF TUT\nhttps://n8n.io/workflows/2417-flux-ai-image-generator/",
+        "height": 280,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8d67ec31-6d09-4fd6-a80f-0d0d48e34a8d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        620
+      ],
+      "id": "83c4309a-88f9-42a0-bbed-504f12c378c2",
+      "name": "NotionSerper1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the article: {{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are an expert AI artist specializing in digital art creation, with deep knowledge of the Atlus Persona series' distinct visual style and web3 concepts. Your role is to create detailed art prompts based on web3 articles while maintaining the following artistic elements:\n\nVISUAL STYLE REQUIREMENTS:\n- Use bold, high-contrast color schemes dominated by black with vibrant accent colors\n- Incorporate sharp, geometric patterns and abstract design elements\n- Apply cel-shading technique for depth and dimension\n- Include UI-inspired visual elements and dynamic compositions\n- Maintain clean, precise linework\n- Utilize modern urban aesthetics with surreal elements\n\nPROMPT STRUCTURE:\n1. Main Subject: [Convert article's core concept into central visual element]\n2. Composition: [Specify layout and focal points]\n3. Color Scheme: [Define primary and accent colors]\n4. Lighting: [Detail the lighting direction and atmosphere]\n5. Style Elements: [List specific Persona-style elements to incorporate]\n6. Technical Specifications: [Define aspect ratio, view angle, art medium]\n\nSPECIAL INSTRUCTIONS:\n- Only use character designs when specific individuals are mentioned in the article\n- Abstract concepts should be represented through symbolic imagery\n- Technical terms should be transformed into visual metaphors\n- Maintain consistency with Persona's graphic design principles\n- Include subtle web3-themed elements in the background\n\nOUTPUT FORMAT:\nProvide only the final art prompt without explanations or notes. Format as a single paragraph with clear, specific details.\n\nEXAMPLE INPUT:\nRedacted has partnered with Mintify, a prominent digital asset trading platform, to elevate user engagement in the Web3 landscape. This collaboration integrates Mintify's 200,000 active users into Redacted's immersive ecosystem, significantly expanding its reach. \nMintify boasts over $70 million in NFT trading volume, providing users with a robust platform for trading various digital assets. The integration will streamline access to an expansive array of digital collectibles and enhance the overall user experience across both platforms.\nIn a strategic move, Mintify has also acquired Magically.gg, a key player in the digital asset space, further bolstering its offerings. The addition of this brand allows for a more consumer-focused environment, enriching the user journey through customized services and products. \nShan Kumar, CEO of Redacted, noted that this partnership aligns with their vision of creating a multifaceted ecosystem where users seamlessly trade, play, and earn. As they collaborate to harness each other's strengths, this partnership is set to redefine user interactions, ultimately fostering a vibrant Web3 community.\n\nEXAMPLE OUTPUT:\nA dynamic digital cityscape merging with abstract data streams, where two massive crystalline structures symbolizing Redacted and Mintify interlock at the center, their surfaces displaying reactive holographic trading data and NFT artwork. The scene is rendered in a dramatic palette of deep blacks and electric blues, accented with pulsing crimson highlights and golden data streams. Volumetric lighting emanates from the intersection point, casting sharp-edged shadows that form geometric patterns reminiscent of Persona 5's menu design. In the foreground, a stylized figure of Shan Kumar stands on a floating platform of interconnected hexagons, his design following Persona's character art style with bold outlines and cel-shading. The background features cascading numbers representing trading volume, integrated with abstract NFT artwork and Magically.gg's brand elements, all unified by flowing UI elements that echo Persona's signature aesthetic. Compose in 16:9 aspect ratio with a slight upward perspective, emphasizing the towering scale of the merged ecosystems."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        100,
+        380
+      ],
+      "id": "cda63e8b-f9d0-426f-b2ee-c0c5dc522105",
+      "name": "Art Prompt Generator1",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86612e12-e2ae-442a-8ec3-6cd4055d25be",
+              "name": "=content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -120,
+        380
+      ],
+      "id": "db0ca962-adf1-4a81-bf2e-b0ad04992ada",
+      "name": "Set to content1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        40,
+        620
+      ],
+      "id": "8fff0bd3-8395-47bb-8215-dd24ddab6a68",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "EId7WN890fo5grDb",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "=Depict {{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "797a475b-549d-4c8b-8c84-1b7b29ca6c30",
+      "name": "Call hugginface inference api",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        880,
+        380
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2YZ4iz6eHMquxX8T",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": " "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1af76e1-6af1-46a4-85b1-75aaef40886c",
+              "name": "=url",
+              "value": "=https://pub-d16d7d90367b44e49faec54388b59854.r2.dev/{{ $json.Key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2100,
+        360
+      ],
+      "id": "b728b2ac-88f3-444e-9e0c-05e00aa68129",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "aiseo",
+        "fileName": "=fg-{{ $execution.id }}.jpg",
+        "additionalFields": {}
+      },
+      "id": "5f13bebc-79f1-4e3e-a022-c2d9fc210f38",
+      "name": "Upload image to S1",
+      "type": "n8n-nodes-base.s3",
+      "position": [
+        1140,
+        360
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "bucket",
+        "operation": "search",
+        "bucketName": "aiseo",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        360
+      ],
+      "id": "cafa6296-45a2-452b-a1e8-77dbfb74ddb4",
+      "name": "S31",
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "LastModified",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        360
+      ],
+      "id": "8b9e4d13-f7b2-49e7-92b8-beff26fa0edb",
+      "name": "Sort1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        360
+      ],
+      "id": "0a69afc5-c634-4eb0-889c-d2246d53efa5",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8cab2c57-7f42-46c9-8192-69705ba8b60d",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        380
+      ],
+      "id": "cc633423-100f-41e5-8e2a-b963172f94c4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "### Run flux model\nIn `Call huggingface inference api` You can change `black-forest-labs/FLUX.1-schnell` in URL parameter to other models:\n- `black-forest-labs/FLUX.1-dev`\n- `Shakker-Labs/FLUX.1-dev-LoRA-AntiBlur`\n- `XLabs-AI/flux-RealismLora`\n- `ByteDance/Hyper-SD`\n\n[See more models on huggingface.co](https://huggingface.co/models?pipeline_tag=text-to-image&sort=trending)\n",
+        "height": 226.2264013670822,
+        "width": 419.0156901664085,
+        "color": 7
+      },
+      "id": "10b77345-4f1f-4935-bcf2-b9b33f64e0a4",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        700,
+        -20
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set to content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Art Prompt Generator1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set to content1": {
+      "main": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call hugginface inference api": {
+      "main": [
+        [
+          {
+            "node": "Upload image to S1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call hugginface inference api",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to S1": {
+      "main": [
+        [
+          {
+            "node": "S31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S31": {
+      "main": [
+        [
+          {
+            "node": "Sort1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call hugginface inference api",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d78424f-defa-4976-9c96-76206d732388",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "awgrTVoEqWZMI3ZT",
+  "tags": []
+}

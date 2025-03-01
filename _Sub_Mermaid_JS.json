@@ -1,0 +1,174 @@
+{
+  "name": "➖Sub Mermaid JS",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        140,
+        440
+      ],
+      "id": "71f29096-317e-43ed-b8b8-2e24fdd9b09e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function formatMermaidCode(text) {\n  if (!text) return '';\n  \n  // First clean up the input text\n  let formattedText = text\n    // Replace literal '\\n' with actual newlines\n    .replace(/\\\\n/g, '\\n')\n    \n    // Remove semicolons\n    .replace(/;/g, '')\n    \n    // Remove duplicate flowchart declarations\n    .replace(/graph TD[;\\s]*/g, '')\n    .replace(/flowchart TD[;\\s]*/g, '')\n    \n    // Clean up quotes and brackets\n    .replace(/\\[\"([^\"]+)\"\\]/g, '(\"$1\")')\n    \n    // Split into lines, filter empty lines, and add proper indentation\n    .split('\\n')\n    .filter(line => line.trim())\n    .map(line => line.trim())\n    .map(line => `    ${line}`)\n    .join('\\n');\n\n  // Construct the final output\n  return `flowchart TD\n%% Nodes and connections\n${formattedText}\n\n`;\n}\n\n// Get input from previous node\nconst inputText = $input.first().json.text;\n\n// Process the text and ensure actual newlines in the output\nconst cleanedMermaid = formatMermaidCode(inputText);\n\n// Return the formatted text\nreturn {\n  json: {\n    formattedText: cleanedMermaid\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        240
+      ],
+      "id": "867ec95b-fc74-4d9f-9153-e666085f2841",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.plan }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Your task is to take as input an Upwork job description and return as output a Mermaid diagram that I can visualize using a subsequent Mermaid.js tool.\n\nOutput your results in plaintext using Mermaid code formatting. Don't output anything but the Mermaid diagram code. \n\nHere's an example of what your output should look like:\n\ngraph TD;\n  A-->B;\n  A-->C;\n  B-->D;\n  C-->D;\n\nRules: \n-You only output flowcharts. Nothing else. No sequence diagrams, no Gantt charts. \n-Do not output any accessory formatting information like ```mermaid.\n-Your first character should be g."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        160,
+        240
+      ],
+      "id": "437d59b4-dd63-4d3d-9c47-b5a2d4950a0d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        760,
+        240
+      ],
+      "id": "ced3bb26-cfc1-4e84-b8e3-9889a2eaf781",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "11046ed1-291e-4dba-997a-1095dcf08e43",
+              "name": "plan",
+              "value": "={{ $json.plan }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -60,
+        240
+      ],
+      "id": "971e592b-7a93-4b17-805f-e227e00cb3b3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -280,
+        240
+      ],
+      "id": "e97af0d5-602d-48da-bbaa-5b5f3254dd74",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c558383d-a705-4900-a81b-f53136d6b781",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "PMZygUqMWVnyVaEQ",
+  "tags": []
+}

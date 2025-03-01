@@ -1,0 +1,373 @@
+{
+  "name": "🤖📰 Notion Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -520,
+        560
+      ],
+      "id": "5424a5e5-3304-426d-8254-e212182e37e6",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"Title\": \"SEO-optimized title\",\n    \"Meta Description\": \"160-character optimized description\",\n    \"Word Count\": \"exact count\",\n    \"Reading Time\": \"calculated minutes\",\n\t\"Content\": \"formatted article\",\n    \"slug\": \"descriptive text after the website name at the end of a URL that identifies a web page on the domain\",\n    \"CTA\": \"Call to action\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1160,
+        820
+      ],
+      "id": "4d84680f-b215-412e-a3e3-20af38a7ad11",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Theme: {{ $json.output.Theme }}\nTarget Audience: {{ $json.output['Target Audience Classification'] }}\n\nTone: {{ $json.output.Tone }}\n\nKeypoints: {{ $json.output['Key Points Covered'] }}\n\nPrimary Keywords: {{ $json.output['Primary Keywords'] }}\nSecondary Keywords: {{ $json.output['Secondary Keywords'] }}\nType: {{ $json.output.Type }}\nTop Improvement Priorities: {{ $json.output['Top Improvement Priorities'] }}\nOptimization Recommendations: {{ $json.output['Optimization Recommendations'] }}\nSuggestions for better matching user intent: \n\nArticle Content: {{ $('Set input field').item.json.content }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# AI Blog Content Creation System Prompt\n\nYou are an advanced blog content optimizer and creator. You will receive specific inputs and use recommended tools to produce high-quality, 200-250 word articles (approximately 2-3 minute read time) maximum of 1,800 characters only. \n\n## Required Input Data\n- Original article URL for analysis\n- Improvement priorities from content audit\n- Optimization recommendations\n- Top ideas for better user matching\n- Target audience specifications\n- Desired tone and style\n- Any specific keywords or SEO targets\n\n\n## Output Requirements\nLength and Format:\n- 200-250 (± 5%) words only\n- Do not exceed 1,800 characters\n- Short paragraphs (2-4 sentences)\n\n## Content Creation Process\n1. Analysis Phase:\n   - Review original article\n   - Analyze improvement priorities\n   - Research top-performing content in the same category\n   - Identify key optimization opportunities\n\n2. Planning Phase:\n   - Create detailed content outline\n   - Map keywords to sections\n   - Plan content flow based on user intent\n\n3. Writing Phase:\n   - Craft attention-grabbing introduction\n   - Develop main sections following optimization recommendations\n   - Include data and statistics from reliable sources\n   - Maintain specified tone and style\n   - Ensure readability at target audience level\n   - Do not exceed 1,800 characters\n   - Do not use * or #\n   - Conclude with a call to action\n\n4. Optimization Phase:\n   - Apply SEO best practices\n   - Optimize for featured snippets\n   - Add internal and external linking opportunities\n   - Implement user matching improvements\n\n5. Quality Control:\n   - Check against original improvement priorities\n   - Verify word count and readability metrics\n   - Ensure all optimization recommendations are addressed\n   - Validate technical accuracy and data citations\n   - Validate the number of words used, make sure not to exceed 1,800.\n\n## Response Format\nFor each article, provide:\n```\nTitle: [SEO-optimized title]\nMeta Description: [160-character optimized description]\nWord Count: [exact count]\nReading Time: [calculated minutes]\nContent: [formatted article]\nslug: [descriptive text after the website name at the end of a URL that identifies a web page on the domain]\nCTA: [Call to action]\n```\n\n## Additional Instructions\n- Always maintain factual accuracy\n- Use current data and statistics\n- Include relevant examples and case studies\n- Implement proper citation format\n- Follow E-E-A-T guidelines\n- Ensure mobile-friendly formatting\n- Include meta information for CMS integration\n\n## Additional Information\n-Stay updated, date is {{ $now }}\n-Source provider is always https://x.com/kiryuuki_atm\n-Use parser tool for final output\n\nRemember to adjust tone, complexity, and technical detail based on the provided target audience specifications while maintaining the required word count and optimization goals. Remember not to use * and # especially in headers. Do not exceed 1,800 characters."
+        }
+      },
+      "id": "72aa1cbd-6749-47ac-9e07-5fdbe5cae115",
+      "name": "Notion Blogger",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        920,
+        560
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"Title\": \"California\",\n\t\"Theme\": \"California\",\n  \t\"Tone\": \"California\",\n    \"Key Points Covered\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n\t\"Target Audience Classification\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n    \"Primary Keywords\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n  \t\"Secondary Keywords\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n    \"Type\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n  \t\"Top Improvement Priorities\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"],\n    \"Optimization Recommendations\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"], \n    \"Suggestions for better matching user intent\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        820
+      ],
+      "id": "bde0d84e-edf4-48ab-bf6b-6d89ddeb1b10",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        820
+      ],
+      "id": "2e96de43-e815-4265-ba66-75af70e54582",
+      "name": "Serper"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the article: {{ $('Set input field').item.json.content }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# AI Article Analysis Prompt\n\nYou are an expert in creating articles, analyze and help classify it according to the following parameters. For each category, select the most appropriate option(s) from the given choices and provide a brief explanation for your selection. Finally, generate a great title based on the analysis.\n\n## Content Structure Analysis\n\nFirst, please provide:\n1. The main topic/theme\n2. Key points covered\n\n## Target Audience Classification\n\nChoose the most appropriate audience from:\n- Web3 gamers\n- Social Media Influencer\n- Crypto Expert\n- Web3 degen\n- Casual\n- Professional\n\nExplain why this audience would find the content most relevant, considering:\n- Technical complexity\n- Language style\n- Required background knowledge\n- Practical applications\n\n## Tone Analysis\n\nSelect the most fitting tone from:\n- Professional\n- Casual\n- Web3 degen\n- Crypto Expert\n- Social Media Influencer\n- Web3 gamers\n\nSupport your choice by analyzing:\n- Language usage\n- Technical terminology\n- Writing style\n- Overall presentation\n\n## Keyword Classification\n\n### Primary Keywords\nSelect the most relevant from:\n- Blockchain\n- Web3\n- Eligible for airdrop\n- Upcoming airdrops\n- Crypto\n- DeFi\n- Yield farming\n- Best meme coins\n- Community tokens\n- P2E games\n\nChoose based on:\n- Content focus\n- Frequency of topic mention\n- Central themes\n\n### Secondary Keywords\nSelect complementary keywords from:\n- Blockchain\n- Web3\n- Eligible for airdrop\n- Upcoming airdrops\n- Crypto\n- DeFi\n- Yield farming\n- Best meme coins\n- Community tokens\n- P2E games\n\nConsider:\n- Supporting themes\n- Related concepts\n- Secondary topics\n\nBase your selection on:\n- Main problem solved\n- Primary user goal\n- Core value proposition\n\n## Type Classification\n\nIdentify the type of project:\n- Play to Earn\n- Meme coin\n- Airdrops\n- Tokens\n- Social Farming \n- NFT\n- Testnet\n- Mainnet\n- Play to airdrop\n\nBase your selection on:\n- Mentioned keywords from the selection like game, P2E (Play to earn), P2A (Play to airdrop), etc.\n- Content theme\n- Project links mentioned\n\n## Final Summary\n\nConclude with:\n1. Top 3 Suggestions for improving keyword integration\n2. Top 3 improvement priorities\n3. Top 3 Ideas for better matching user intent\n4. Title based on the analysis\n\nMaintain and be consistent in structured output. Stick with same structure and names for schema. \nTone should be picked from the given selection.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        460,
+        560
+      ],
+      "id": "ff372363-3510-4338-a605-f1c745fe47e4",
+      "name": "Article analyzer",
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1020,
+        820
+      ],
+      "id": "085fab7c-dde5-406a-ba47-a06907bd868e",
+      "name": "NotionSerper"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        560
+      ],
+      "id": "6d3200e3-8514-42f1-86c8-c5f8c323dfca",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a20f76e9-af5a-46c5-a17e-63646760028f",
+              "name": "content",
+              "value": "={{ $json.content || $json.summary}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        20,
+        560
+      ],
+      "id": "392f453c-43ab-4126-804e-a922b33115a9",
+      "name": "Set input field"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        820
+      ],
+      "id": "899a2f8e-c21f-44ee-8e0c-9f9f8cf2029e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "O4Z6K8hVDLQCaBTD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        820
+      ],
+      "id": "0f77c219-e3dd-4a0c-93a9-9fa331e2c0bd",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "O4Z6K8hVDLQCaBTD",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Notion Blogger",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Article analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article analyzer": {
+      "main": [
+        [
+          {
+            "node": "Notion Blogger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper": {
+      "ai_tool": [
+        [
+          {
+            "node": "Notion Blogger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set input field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion Blogger": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set input field": {
+      "main": [
+        [
+          {
+            "node": "Article analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Article analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Notion Blogger",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "51369eba-8143-479d-a621-d02c9050f016",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "2FmdlnOfkurY9rMO",
+  "tags": [
+    {
+      "createdAt": "2025-02-21T05:41:24.775Z",
+      "updatedAt": "2025-02-21T05:41:24.775Z",
+      "id": "enNw461gjg3bjjlO",
+      "name": "Agent"
+    },
+    {
+      "createdAt": "2025-02-21T05:41:24.820Z",
+      "updatedAt": "2025-02-21T05:41:24.820Z",
+      "id": "yiCETBmgPvdWFuiK",
+      "name": "notion"
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+{
+  "name": "1.1🔥🔥nftnewstoday to Notion Source",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "18aa83da-9783-806e-9b78-f4772ac794a7",
+          "mode": "list",
+          "cachedResultName": "Source",
+          "cachedResultUrl": "https://www.notion.so/18aa83da9783806e9b78f4772ac794a7"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "URL|url",
+              "condition": "equals",
+              "urlValue": "={{ $json.link }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -500,
+        20
+      ],
+      "id": "671c10b4-6dcc-41e6-a3d8-45ec988475c4",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d889c2b8-2731-48f8-9ba1-c4a35077521d",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -280,
+        20
+      ],
+      "id": "c7e83970-0314-463b-9908-3a461aef7321",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb687ad8-5893-46b1-bb16-a73a573e4555",
+              "name": "content",
+              "value": "={{ $('RSS Feed Trigger').first().json['content:encodedSnippet'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7d0f9caa-4ea6-43cf-8117-b022a3290b8d",
+      "name": "Set Content"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://coinjournal.net/news/feed/"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        20
+      ],
+      "id": "b99976c6-72f4-49c5-bed8-44829a0eb8f7",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Article entry for review!\n\n{{ $json.name }}\n{{ $json.url }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "d737f329-1d91-4293-bf86-5ec9ee9b9971",
+      "name": "Telegram1",
+      "webhookId": "0bf8e718-28b2-4628-8fe2-33a63b92554c",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "qs7vjEZg5ZFBBMmd",
+          "mode": "list",
+          "cachedResultName": "🤖🏗️Content Researcher V1.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        0
+      ],
+      "id": "094e5ffd-29d1-45d9-8f7e-99338003eefb",
+      "name": "Execute Notion Creator Workflow1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "18aa83da-9783-806e-9b78-f4772ac794a7",
+          "mode": "list",
+          "cachedResultName": "Source",
+          "cachedResultUrl": "https://www.notion.so/18aa83da9783806e9b78f4772ac794a7"
+        },
+        "title": "={{ $json.output.Title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Content|rich_text",
+              "textContent": "={{ $json.output.Content }}"
+            },
+            {
+              "key": "URL|url",
+              "ignoreIfEmpty": true,
+              "urlValue": "={{ $('RSS Feed Trigger').first().json.link }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "For Review"
+            },
+            {
+              "key": "Meta Description|rich_text",
+              "textContent": "={{ $json.output['Meta Description'] }}"
+            },
+            {
+              "key": "Word count|rich_text",
+              "textContent": "={{ $json.output['Word Count'] }}"
+            },
+            {
+              "key": "Reading Time|rich_text",
+              "textContent": "={{ $json.output['Reading Time'] }}"
+            },
+            {
+              "key": "slug|rich_text",
+              "textContent": "={{ $json.output['slug'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        540,
+        0
+      ],
+      "id": "73a26026-01b3-41e8-afa6-551373209e9d",
+      "name": "Update Source1",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RSS will be the source of articles. \n\nWorkflow \n1. Wait for article from RSS\n2. Generate a good title, SEO \n3. Analyze the article, which parts need to be improved\n4. Notion Blogger will use tools in order to apply the recommendations and upgrades\n5. Update Notion Source to for review\n6. Update user with the new article for review.\n",
+        "height": 380,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        120
+      ],
+      "id": "69d15d49-8e96-48d2-a4d3-29819fee86cf",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Set Content": {
+      "main": [
+        [
+          {
+            "node": "Execute Notion Creator Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Notion Creator Workflow1": {
+      "main": [
+        []
+      ]
+    },
+    "Update Source1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f4745386-acfc-4d96-b074-93fcb9bde7d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "htlsusFMEkjbpBi3",
+  "tags": []
+}

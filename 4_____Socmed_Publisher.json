@@ -1,0 +1,767 @@
+{
+  "name": "4.🔥🔥Socmed Publisher",
+  "nodes": [
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v21.0",
+        "node": "me",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.property_fb_post }}\n\n"
+              },
+              {
+                "name": "url",
+                "value": "={{ $json.property_image[0] }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        680
+      ],
+      "id": "90f342e4-a1d1-4ea7-a837-78a22d4cc106",
+      "name": "FB - Gaming Grounds",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "hlB27xAMQORdMjrj",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v21.0",
+        "node": "17841471709317128",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $json.property_image[0] }}"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $json.property_ig_post }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        840
+      ],
+      "id": "0e4c49f5-5184-4498-909c-300e1f8725ba",
+      "name": "Create IG container",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "hlB27xAMQORdMjrj",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v21.0",
+        "node": "17841471709317128",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "={{ $('Notion').item.json.property_image[0] }}"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $('Notion').item.json.property_ig_post }}"
+              },
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        180,
+        840
+      ],
+      "id": "7b4e0471-060f-446c-a7cb-d84a3995f588",
+      "name": "Post to IG",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "hlB27xAMQORdMjrj",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Post to SocMed \n\n",
+        "height": 760,
+        "width": 680,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        600
+      ],
+      "id": "acaf7c47-e3f1-4bae-9926-91c23667e94a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('HTTP Request1').item.json.property_twitter_post }}\n",
+        "additionalFields": {
+          "attachments": "={{ $json.media_id_string }}"
+        }
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        340,
+        980
+      ],
+      "id": "972e0f3d-af21-4aa4-8386-2e489ee065fc",
+      "name": "X",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "3g24EXHDhRbq1QqX",
+          "name": "X account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://upload.twitter.com/1.1/media/upload.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=OAuth oauth_consumer_key=\"UT0LWA6mQEOPTQUERHYbR17GY\", oauth_token=\"1501512380807004160-MFAvrQ9Bw3oBKz6XKXE8i5nI01o65B\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1740464378\", oauth_nonce=\"7z91DM370XEaOwEW2LoLI5PAO3WMmqL1613BfAg7w\", oauth_version=\"1.0\", oauth_signature=\"eZHiahz0Zymxbx3PN6SgUWBr2sg%3D\""
+            },
+            {
+              "name": "cookie",
+              "value": "guest_id=v1%3A173450663175949164;lang=en;"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "media",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        100,
+        1000
+      ],
+      "id": "9e26044a-ecd5-4856-aaaf-53ea9a2cb2ea",
+      "name": "Generate media ID",
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "## Regen Twitter keys\n\nNot working yet\nIG Reels\n",
+        "height": 460,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9289858a-3580-46b1-ab57-c10bc792299a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.property_image[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        1000
+      ],
+      "id": "3c5a47a8-eae0-4e0f-9df3-5246470b356e",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "const crypto = require('crypto');\n\n// Vos clés et tokens\n// oauth_consumer_key = API Key (Twitter Developer Portal)\nconst oauth_consumer_key = 'pvkFSLT4MwR5pjQ0mpq5CSiSe';\n// oauth_consumer_secret = API Key Secret (Twitter Developer Portal)\nconst oauth_consumer_secret = 'SEY2s5Y2ZNNxUQiVyM2Zsn21fRSmeqXSKqxf3g65rjYoTII0rK';\n// oauth_token = Access Token (Twitter Developer Portal)\nconst oauth_token = '1501512380807004160-MFAvrQ9Bw3oBKz6XKXE8i5nI01o65B';\n// oauth_token_secret = Access Token Secret (Twitter Developer Portal)\nconst oauth_token_secret = '3ONGzVzOLsUrWghNpCqQjqKpmPsr4u76daNjMWxLxH3Bm';\n\n// Paramètres de la requête\nconst method = 'POST';\nconst url = 'https://upload.twitter.com/1.1/media/upload.json';\nconst timestamp = Math.floor(Date.now() / 1000).toString();\nconst nonce = crypto.randomBytes(32).toString('base64').replace(/[^a-zA-Z0-9]/g, '');\n\n// Paramètres OAuth\nconst parameters = {\n    oauth_consumer_key,\n    oauth_nonce: nonce,\n    oauth_signature_method: 'HMAC-SHA1',\n    oauth_timestamp: timestamp,\n    oauth_token,\n    oauth_version: '1.0'\n};\n\n// Trier les paramètres\nconst sortedParams = Object.keys(parameters)\n    .sort()\n    .reduce((acc, key) => {\n        acc[key] = parameters[key];\n        return acc;\n    }, {});\n\n// Créer la chaîne de paramètres\nconst paramString = Object.entries(sortedParams)\n    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)\n    .join('&');\n\n// Créer la chaîne de base pour la signature\nconst baseString = [\n    method,\n    encodeURIComponent(url),\n    encodeURIComponent(paramString)\n].join('&');\n\n// Créer la clé de signature\nconst signingKey = `${encodeURIComponent(oauth_consumer_secret)}&${encodeURIComponent(oauth_token_secret)}`;\n\n// Générer la signature\nconst signature = crypto\n    .createHmac('sha1', signingKey)\n    .update(baseString)\n    .digest('base64');\n\n// Créer l'en-tête Authorization au format exact requis\nconst authHeader = `OAuth oauth_consumer_key=\"${oauth_consumer_key}\", oauth_token=\"${oauth_token}\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"${timestamp}\", oauth_nonce=\"${nonce}\", oauth_version=\"1.0\", oauth_signature=\"${encodeURIComponent(signature)}\"`;\n\n// Cookie header\nconst cookieHeader = 'guest_id=v1%3A173450663175949164;lang=en;';\n\nconsole.log('Headers à utiliser dans n8n:');\nconsole.log('\\nAuthorization:');\nconsole.log(authHeader);\nconsole.log('\\ncookie:');\nconsole.log(cookieHeader);",
+        "height": 320,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        120
+      ],
+      "id": "75814b9a-ea22-4bcc-be6b-c30a63c15f3a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "CODE FOR GENERATING Twitter Keys\nRequired for posting media\n",
+        "height": 80,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        0
+      ],
+      "id": "2f1a88be-ef08-4e6a-a5b3-1a6e2297df2f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v21.0",
+        "node": "me",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "url",
+                "value": "={{ $json.property_image[0] }}"
+              },
+              {
+                "name": "published",
+                "value": "false"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        1180
+      ],
+      "id": "b4841101-3406-4b95-880c-783b4a9a49d6",
+      "name": "FB - Create Story media ID",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "hlB27xAMQORdMjrj",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v21.0",
+        "node": "me",
+        "edge": "photo_stories",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "photo_id",
+                "value": "={{ $json.id }}"
+              },
+              {
+                "name": "description",
+                "value": "={{ $('Notion').item.json.property_fb_story }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        120,
+        1180
+      ],
+      "id": "bb9a0709-162b-4565-9ab7-04abd24c30eb",
+      "name": "FB - Story post",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "hlB27xAMQORdMjrj",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Twitter posting error!\n{{ $json.error.code }}\n{{ $json.error.status }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        1360
+      ],
+      "id": "e05d534e-0a2b-4ec5-88e2-d5733ed1f38d",
+      "name": "Telegram",
+      "webhookId": "f1d6b94a-cffd-4229-8203-a62fa23885d3",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        660,
+        920
+      ],
+      "id": "24729744-ac16-44c7-99d2-2ae237fb5c9a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=FB post\nhttps://www.facebook.com/photo?fbid={{ $('Aggregate').first().json.id[0].toNumber() }}\nTwitter post\nhttps://x.com/kiryuuki_atm/status/{{ $('Aggregate').first().json.id[2].toNumber() }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1980,
+        920
+      ],
+      "id": "a127a32b-9e2e-422b-be19-342d9b5fcfc9",
+      "name": "Telegram2",
+      "webhookId": "f1d6b94a-cffd-4229-8203-a62fa23885d3",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "id",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        880,
+        920
+      ],
+      "id": "1656ed90-090f-4a5f-85f7-a49b9cf29289",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        920
+      ],
+      "id": "2c4b88b4-e76d-4328-b326-acf8764a01ae",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=33 */3 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -840,
+        720
+      ],
+      "id": "3dd471b3-0528-4dbf-933c-f4236e148575",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "18ca83da-9783-8039-baab-ecb1d3e45cc6",
+          "mode": "list",
+          "cachedResultName": "AI Content SocMed",
+          "cachedResultUrl": "https://www.notion.so/18ca83da97838039baabecb1d3e45cc6"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|select",
+              "condition": "equals",
+              "selectValue": "🔍In Review"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Publication Date|created_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -620,
+        720
+      ],
+      "id": "7e0e84fd-6976-45d2-a8fe-33e5cd31c556",
+      "name": "Notion",
+      "alwaysOutputData": false,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|select",
+              "selectValue": "Published"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1780,
+        920
+      ],
+      "id": "5c333eff-1744-412d-bb6d-449aa2c4e6a8",
+      "name": "Update Source",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1320,
+        980
+      ],
+      "id": "9b66e63d-75a0-48e7-99d3-e4df10b0047e",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        980
+      ],
+      "id": "8221ef27-b5e9-45fd-a22e-10f7e0ac4ae8",
+      "name": "Limit"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "FB - Gaming Grounds": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create IG container": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "X": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Generate media ID": {
+      "main": [
+        [
+          {
+            "node": "X",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Generate media ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB - Create Story media ID": {
+      "main": [
+        [
+          {
+            "node": "FB - Story post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB - Story post": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "FB - Gaming Grounds",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create IG container",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FB - Create Story media ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Source": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Update Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e3b16766-70f0-4374-aef2-243f3ab8aee0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "tV1ZILqHNQBLeJkk",
+  "tags": []
+}

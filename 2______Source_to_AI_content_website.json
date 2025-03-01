@@ -1,0 +1,573 @@
+{
+  "name": "2. 🔥🔥Source to AI content website",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9d9287cd-308b-472d-819a-9689e546eafb",
+              "name": "content",
+              "value": "={{ $json.property_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -740,
+        460
+      ],
+      "id": "c9fb278d-aaab-4f78-a9d3-01e0210c749f",
+      "name": "Set content1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "XotDbNwdPTMGr0zo",
+          "mode": "list",
+          "cachedResultName": "🎨 Art Generator 2.0"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -360,
+        300
+      ],
+      "id": "3910e78f-45b8-4b51-88bf-2d3afad4fdcb",
+      "name": "Execute Art Generator Workflow"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Source to Site!\n\n{{ $('Notion1').item.json.property_title }}\n{{ $json.url }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        300
+      ],
+      "id": "5f9f509d-2534-4c05-8180-2ca6b45c2124",
+      "name": "Telegram",
+      "webhookId": "6a24873c-5857-4452-ab31-4f236b9c8fca",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Notion1').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|select",
+              "selectValue": "Posted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        500,
+        300
+      ],
+      "id": "d80b7b9e-efb8-48d4-8dcb-a0fcab000159",
+      "name": "Update Source",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=2 */1 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        460
+      ],
+      "id": "8e835adf-25b3-41f5-a586-7ea9f83bebe3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "18aa83da-9783-806e-9b78-f4772ac794a7",
+          "mode": "list",
+          "cachedResultName": "Source",
+          "cachedResultUrl": "https://www.notion.so/18aa83da9783806e9b78f4772ac794a7"
+        },
+        "limit": 1,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|select",
+              "condition": "equals",
+              "selectValue": "For Review"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Publication Date|created_time",
+                "direction": "ascending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1000,
+        460
+      ],
+      "id": "b9841e60-eaae-4c0e-9c35-8bb767326a71",
+      "name": "Notion1",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Cron trigger to fetch entries from Notion Source \nNotion node filter\nSet content\nGenerate Art using another workflow\nUpdate Notion Source DB to Posted",
+        "height": 280,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        60
+      ],
+      "id": "b5d4407b-d4b5-4739-be90-0d7779f6c581",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "87fb683c-4ddd-4adf-b941-27013d1ddc54",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -520,
+        460
+      ],
+      "id": "fcf912ea-771f-46df-b95d-9c25e11deb99",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Content error in Step 2: Source to AI Content!\nCheck workflow.\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -360,
+        620
+      ],
+      "id": "7a9eddc1-699b-4e42-90a7-8a0bbd7cec57",
+      "name": "Telegram1",
+      "webhookId": "424eb3a2-5d3c-4b67-bfdd-6f1d17dda3bc",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Art Generator gets the latest image after creating one. "
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        120
+      ],
+      "id": "8e959831-b8e4-44d9-9c88-f8ce9060a8c9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-800e-b7f2-f34cc1ac255d",
+          "mode": "list",
+          "cachedResultName": "Trending in web3!",
+          "cachedResultUrl": "https://www.notion.so/19da83da9783800eb7f2f34cc1ac255d"
+        },
+        "title": "={{ $('Notion1').first().json.property_title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "title|title",
+              "title": "={{ $('Notion1').item.json.property_title }}"
+            },
+            {
+              "key": "slug|rich_text",
+              "textContent": "={{ $('Notion1').item.json.property_slug }}"
+            },
+            {
+              "key": "status|select",
+              "selectValue": "Draft"
+            },
+            {
+              "key": "type|select",
+              "selectValue": "Post"
+            },
+            {
+              "key": "date|date",
+              "date": "={{ $now }}",
+              "timezone": "Asia/Manila"
+            },
+            {
+              "key": "summary|rich_text",
+              "textContent": "={{ $('Notion1').item.json.property_meta_description }}"
+            },
+            {
+              "key": "Content|rich_text",
+              "textContent": "={{ $('Edit Fields').item.json.content }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "={{ $('Notion1').first().json.property_meta_description }}"
+            },
+            {
+              "type": "image",
+              "url": "={{ $('Execute Art Generator Workflow').first().json.url }}"
+            },
+            {
+              "textContent": "={{ $('Notion1').first().json.property_content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        300
+      ],
+      "id": "f6390afe-9b71-4a4d-ab3e-303f88922791",
+      "name": "Create entry for AI Content website",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://api.notion.com/v1/pages/{{ $('Create entry for AI Content website').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "cover",
+              "value": "={{\n  {\n    \"type\": \"external\",\n    \"external\": {\n      \"url\": $('Execute Art Generator Cover Image').item.json.url\n    }\n}\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "974e6b3f-de4c-4f45-a878-002d28141ef9",
+      "name": "Update page cover",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        700,
+        300
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2WYFdwPeoDZ4zMgB",
+          "mode": "list",
+          "cachedResultName": "🎨 Art Gen 🤖 HF Cover"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        300
+      ],
+      "id": "57698659-38dc-4cb7-84d3-5fff6b170081",
+      "name": "Execute Art Generator Cover Image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b61f8e5c-a2b9-4774-b116-7e47ca336ba6",
+              "name": "content",
+              "value": "={{ $('If').item.json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -140,
+        300
+      ],
+      "id": "013cb18e-4f14-4557-8f4d-275c86bcde51",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## Create an art generator with memory for art prompts. Art prompts can be switched easier using memory\n\nCurrent DB for memory: Airtable\nTarget DB: Notion",
+        "height": 240,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a86da121-fa17-42ad-af5a-7978624284f9",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set content1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Art Generator Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Source": {
+      "main": [
+        [
+          {
+            "node": "Update page cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Set content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Art Generator Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create entry for AI Content website": {
+      "main": [
+        [
+          {
+            "node": "Update Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update page cover": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Art Generator Cover Image": {
+      "main": [
+        [
+          {
+            "node": "Create entry for AI Content website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Execute Art Generator Cover Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "915d8204-5cfa-49d3-b9eb-eaabb0c9b1d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "h7a8Pej07GNThAdp",
+  "tags": []
+}

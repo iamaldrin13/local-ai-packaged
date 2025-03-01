@@ -1,0 +1,772 @@
+{
+  "name": "🎨 Art Generator 2.0",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -540,
+        480
+      ],
+      "id": "b3290e0f-0f2a-4ae5-9d86-5ea9f6ee6154",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "content": "v2.0\nAdded memory for different art prompts\nAgent selects art prompt randomly\nAdded human in the loop to verify art creation, if verification fails, workflow repeats prompt > image > verification\n\n## Art Generator\n1. Create a prompt based on provided content \n2. Generate image Flux via Huggingface API\n3. Upload the image to cloudflare S2 bucket so that the link will not expire\n\nWF TUT\nhttps://n8n.io/workflows/2417-flux-ai-image-generator/",
+        "height": 320,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        280,
+        40
+      ],
+      "id": "1a044691-d733-4d2e-b20c-e69bd54d0803",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        660
+      ],
+      "id": "306bb178-2f95-44de-9271-855d74a1c480",
+      "name": "NotionSerper1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=An article to analyze : {{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are an Art Prompt Generator Assistant who receives:\n\nA memory bank of art styles and their characteristics : {{ $json.agentdata.toJsonString() }}\n\nYour task is to:\n\nExtract themes and key elements from the article\nIdentify the mood and emotional tone from the article\nRandomly select one art style from your memory\nGenerate a single prompt that combines all elements\n\nNegative prompts:\nBlurred, blurry, signature, watermark, wrongly spelled words\n\nOutput only the final prompt in this format:\n[Subject from article] in style of [random art style], featuring [key elements from article], with [mood/tone] atmosphere, created using [style's techniques], with [style's color palette], composed with [style's composition rules]. Emotional tone: [emotional qualities]. Additional details: [descriptive elements from article].\nNo analysis, explanations, or other text should be included - output only the prompt itself.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        260,
+        480
+      ],
+      "id": "0ba719e8-5b37-4dcb-8c0b-1cc24911bbe0",
+      "name": "Art Prompt Generator1",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86612e12-e2ae-442a-8ec3-6cd4055d25be",
+              "name": "=content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        480
+      ],
+      "id": "6c9d457a-db77-44ac-b225-ea3c8fe21817",
+      "name": "Set to content1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "=Depict {{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1bcbdf05-ac5d-4a41-8c30-a3fe2895ac98",
+      "name": "Call hugginface inference api",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        660,
+        480
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2YZ4iz6eHMquxX8T",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": " "
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "aiseo",
+        "fileName": "=fg-{{ $execution.id }}.jpg",
+        "additionalFields": {}
+      },
+      "id": "87fb5bd2-1d92-42af-92a6-5d676b34cebf",
+      "name": "Upload image to S1",
+      "type": "n8n-nodes-base.s3",
+      "position": [
+        980,
+        420
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "LastModified",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        420
+      ],
+      "id": "d6e94692-4cca-4c37-849b-48356d9c98ec",
+      "name": "Sort1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1660,
+        420
+      ],
+      "id": "3d97a825-6483-4858-a0a6-6c56a69cf05a",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8cab2c57-7f42-46c9-8192-69705ba8b60d",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2140,
+        500
+      ],
+      "id": "5af5bd5d-ab9d-459d-9fe0-843fde0cba03",
+      "name": "If",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Art"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -300,
+        180
+      ],
+      "id": "2e9d2f55-c0f8-44bd-8f8c-fec1f7f6d3c3",
+      "name": "Notion1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "agentdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        180
+      ],
+      "id": "9f61447a-90fb-454c-9440-e328799835b1",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        60,
+        360
+      ],
+      "id": "e728b588-57e7-4a86-b9cd-ca299d857a7b",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        100
+      ],
+      "id": "f1c5a30b-9375-4df6-9f5b-d773a24020fc",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "7190215269",
+        "message": "=Art prompt: {{ $('Art Prompt Generator1').first().json.output }}\n\nhttps://pub-d16d7d90367b44e49faec54388b59854.r2.dev/{{ $json.Key }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "limitWaitTime": {
+            "values": {
+              "resumeUnit": "days"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        440
+      ],
+      "id": "63a8cdf3-25df-4eed-8486-5d6fbcfd31ad",
+      "name": "Telegram",
+      "webhookId": "f2b99d5b-8413-47ae-979f-9a22fb29854b",
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        260,
+        660
+      ],
+      "id": "ad3a5b96-6866-495c-886c-2dd5bc2d1943",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2JjvM6ZIADQUl0N0",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        580
+      ],
+      "id": "443a39b2-c352-49e6-bcf4-3c58dfd6e5d3",
+      "name": "Wait",
+      "webhookId": "8a8d7317-5d07-4a26-aa45-1b697a18e8dc"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1af76e1-6af1-46a4-85b1-75aaef40886c",
+              "name": "=url",
+              "value": "=https://pub-d16d7d90367b44e49faec54388b59854.r2.dev/{{ $json.Key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2560,
+        460
+      ],
+      "id": "13545994-c7f5-4acc-a772-e480ec010a0a",
+      "name": "Return Results"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0749b024-b23e-459e-935e-3de2db44b6f4",
+              "name": "content",
+              "value": "={{ $('Merge3').first().json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "720bcd50-0bf9-4fe7-9cbf-5326923804a2",
+              "name": "agentdata",
+              "value": "={{ $('Merge3').item.json.agentdata }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2560,
+        700
+      ],
+      "id": "58f25c72-98c9-4f21-87dd-9f654c4317c9",
+      "name": "Repeat generation",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "bucket",
+        "operation": "search",
+        "bucketName": "aiseo",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        420
+      ],
+      "id": "dd898650-f820-430b-a8d7-933bbd18eabf",
+      "name": "Search bucket",
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a42d8bf1-87c9-4eb9-9986-f121b4348669",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        580
+      ],
+      "id": "beeb6c6b-ef92-4dd6-8e31-e0b60ea02ca2",
+      "name": "Sets fields"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "aiseo",
+        "fileKey": "={{ $json.Key }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        620
+      ],
+      "id": "cee5fd6f-af4d-4e17-9c6d-dd892567ddca",
+      "name": "Search bucket1",
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set to content1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Art Prompt Generator1": {
+      "main": [
+        [
+          {
+            "node": "Call hugginface inference api",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set to content1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call hugginface inference api": {
+      "main": [
+        [
+          {
+            "node": "Upload image to S1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to S1": {
+      "main": [
+        [
+          {
+            "node": "Search bucket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Return Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search bucket1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Sets fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Repeat generation": {
+      "main": [
+        [
+          {
+            "node": "Art Prompt Generator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search bucket": {
+      "main": [
+        [
+          {
+            "node": "Sort1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sets fields": {
+      "main": [
+        [
+          {
+            "node": "Call hugginface inference api",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search bucket1": {
+      "main": [
+        [
+          {
+            "node": "Repeat generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5885806e-8afd-41c2-b81d-efbeed1ea5b6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "XotDbNwdPTMGr0zo",
+  "tags": []
+}

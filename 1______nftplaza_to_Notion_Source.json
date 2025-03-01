@@ -1,0 +1,339 @@
+{
+  "name": "1. 🔥🔥nftplaza to Notion Source",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://nftplazas.com/feed/"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        80
+      ],
+      "id": "3682336a-dade-4847-b1fe-e4288a3a529f",
+      "name": "RSS Feed Trigger1"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Article entry for review!\n\n{{ $json.name }}\n{{ $json.url }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1480,
+        200
+      ],
+      "id": "cee1c8f5-21c4-477f-a2c3-a5faeb7568b4",
+      "name": "Telegram",
+      "webhookId": "0bf8e718-28b2-4628-8fe2-33a63b92554c",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RSS will be the source of articles. \n\nWorkflow \n1. Wait for article from RSS\n2. Generate a good title, SEO \n3. Analyze the article, which parts need to be improved\n4. Notion Blogger will use tools in order to apply the recommendations and upgrades\n5. Update Notion Source to for review\n6. Update user with the new article for review.\n",
+        "height": 380,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        180
+      ],
+      "id": "afb5f164-a067-4102-90ef-7649f07c2859",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "qs7vjEZg5ZFBBMmd",
+          "mode": "list",
+          "cachedResultName": "🤖🏗️Content Researcher V1.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        200
+      ],
+      "id": "41f3b960-bda9-4953-8b47-6cb458f7d090",
+      "name": "Execute Notion Creator Workflow",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "18aa83da-9783-806e-9b78-f4772ac794a7",
+          "mode": "list",
+          "cachedResultName": "Source",
+          "cachedResultUrl": "https://www.notion.so/18aa83da9783806e9b78f4772ac794a7"
+        },
+        "title": "={{ $json.output.Title }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Content|rich_text",
+              "textContent": "={{ $json.output.Content }}"
+            },
+            {
+              "key": "URL|url",
+              "ignoreIfEmpty": true,
+              "urlValue": "={{ $('RSS Feed Trigger1').item.json.link }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "For Review"
+            },
+            {
+              "key": "Meta Description|rich_text",
+              "textContent": "={{ $json.output['Meta Description'] }}"
+            },
+            {
+              "key": "Word count|rich_text",
+              "textContent": "={{ $json.output['Word Count'] }}"
+            },
+            {
+              "key": "Reading Time|rich_text",
+              "textContent": "={{ $json.output['Reading Time'] }}"
+            },
+            {
+              "key": "slug|rich_text",
+              "textContent": "={{ $json.output['slug'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1220,
+        200
+      ],
+      "id": "0b4220c4-ab53-4ab3-bffa-e275d0e9fb3d",
+      "name": "Update Source",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "18aa83da-9783-806e-9b78-f4772ac794a7",
+          "mode": "list",
+          "cachedResultName": "Source",
+          "cachedResultUrl": "https://www.notion.so/18aa83da9783806e9b78f4772ac794a7"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "URL|url",
+              "condition": "equals",
+              "urlValue": "={{ $json.link }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        60,
+        80
+      ],
+      "id": "d748b1bc-c0e1-4a4c-89a1-a523c4f6ae45",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d889c2b8-2731-48f8-9ba1-c4a35077521d",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        80
+      ],
+      "id": "fc773281-5b33-4e4a-97c0-44e26c5793d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb687ad8-5893-46b1-bb16-a73a573e4555",
+              "name": "content",
+              "value": "={{ $('RSS Feed Trigger1').item.json['content:encodedSnippet'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        60
+      ],
+      "id": "21bea153-a3c3-40f3-bd30-2ca837172c12",
+      "name": "Set Content"
+    },
+    {
+      "parameters": {
+        "content": "## Checks for duplicates\n",
+        "height": 240,
+        "width": 460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d2d9b853-e8d6-4b19-8348-546aa0da3189",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RSS Feed Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Notion Creator Workflow": {
+      "main": [
+        []
+      ]
+    },
+    "Update Source": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Set Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Content": {
+      "main": [
+        [
+          {
+            "node": "Execute Notion Creator Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "029c86c3-870d-4603-811f-bbd413c42245",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "svV1eCS4JePuRVVX",
+  "tags": []
+}

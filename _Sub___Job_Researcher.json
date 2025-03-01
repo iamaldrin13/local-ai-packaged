@@ -1,0 +1,616 @@
+{
+  "name": "➖Sub - Job Researcher",
+  "nodes": [
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"problem\": \"Manually updating the StoreMapper with distributor data causes delays and errors. How can we automate this using Zapier to sync Excel, Cin7/Xero, and Shopify?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        240
+      ],
+      "id": "41905a6f-9e6c-4b8b-b261-596044253532",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1-distill-llama-70b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        340,
+        260
+      ],
+      "id": "980c42fb-d2bb-4dad-bc9e-e6652dd375e4",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"plan\": \"Manually updating the StoreMapper with distributor data causes delays and errors. How can we automate this using Zapier to sync Excel, Cin7/Xero, and Shopify?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        240
+      ],
+      "id": "11151c53-d43c-4058-923d-2a4da09f17f9",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1-distill-llama-70b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        820,
+        260
+      ],
+      "id": "9c792aa6-06a3-4657-978d-cbd0c46e1379",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=job description: {{ $('When Executed by Another Workflow').item.json.jobDescription }}\n\nproblem: {{ $json.output.problem }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an upwork job applicant create a roadmap for solving the problem, ensuring the solution is feasible, scalable, and compatible with the employer’s requirements. Address the problem and create a plan for solving it. \n\nDesired Output:\n\nA step-by-step plan outlining:\n\nMethods: Workflow audits, data flow mapping, automation testing.\n\nMetrics: Time saved, error rates, client feedback.\n\nValidation: Testing with a pilot."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        840,
+        0
+      ],
+      "id": "4c6ef981-8860-43e5-bbf8-16d9569000cb",
+      "name": "Step 2: Design Research Plan",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.jobDescription }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an upwork job researcher identify the core inefficiency and frame the problem in a way that justifies automation. This step ensures alignment with the employer’s goals (accuracy, efficiency) and clarifies why automation using n8n is necessary. You ll be provided with a job description to analyze.\n\nDesired Output:\n\nA problem statement that highlights:\n\nThe manual process \nThe negative impacts \nA specific research question focused on automation\n\nExample Output:\n\n“Manually updating the StoreMapper with distributor data causes delays and errors. How can we automate this using n8n to sync Excel, Cin7/Xero, and Shopify?”"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        360,
+        0
+      ],
+      "id": "16658748-126c-43bf-bef0-e19d51b77a1b",
+      "name": "Step 1:  Define the Problem",
+      "executeOnce": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"application\": \"Manually updating the StoreMapper with distributor data causes delays and errors. How can we automate this using Zapier to sync Excel, Cin7/Xero, and Shopify?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1740,
+        280
+      ],
+      "id": "ab08941b-fe8b-4c77-a752-2d28e0526ab3",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for research",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1560,
+        280
+      ],
+      "id": "a61ad584-c18f-4f7d-aeb8-b437488fa8bf",
+      "name": "research_tool"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        280
+      ],
+      "id": "ad772b78-173f-4120-af5b-64445f4d4e4b",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=job description: {{ $('When Executed by Another Workflow').item.json.jobDescription }}\n\nplan: {{ $json.output.plan }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an upwork job applicant gather evidence proving the problem exists and that automation will solve it. Demonstrate analytical rigor and attention to real-world constraints (e.g., inconsistent Excel formats). Use research tool for more insights.\n\nDesired Output:\n\nQuantitative data:\n\nBaseline metrics.\n\nResults from automation tests.\n\nQualitative data:\n\nPain points from client.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1420,
+        0
+      ],
+      "id": "0b226388-948e-42ee-bed3-99fcda7c00f4",
+      "name": "Step 3: Data Collection",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"conclusion\": \"Manually updating the StoreMapper with distributor data causes delays and errors. How can we automate this using Zapier to sync Excel, Cin7/Xero, and Shopify?\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        280
+      ],
+      "id": "a43db1ec-3b9c-4202-994d-0a47dbfc7e45",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for research",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        2140,
+        280
+      ],
+      "id": "ca662b67-8070-459c-9215-39e74019afd9",
+      "name": "research_tool1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        280
+      ],
+      "id": "8733f3e6-628b-46c3-9eac-0b4fcf3a9aff",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=job description: {{ $('When Executed by Another Workflow').item.json.jobDescription }}\n\nplan: {{ $json.output.application }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an upwork job applicant synthesize application into actionable recommendations, showing how automation solves the problem and adds value (e.g., faster updates, happier customers).\n\nExample:\n\nDesired Output:\n\nKey results:\n\nEfficiency gains.\n\nError reduction.\n\nActionable solution:\n\nStep-by-step automation workflow.\n\nLimitations and future steps:\n\nAddressing manual submissions.\n\nScaling the solution."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2000,
+        0
+      ],
+      "id": "9ebdc08e-53f0-46ca-988e-26c06cbf6a33",
+      "name": "Step 3: Data Collection1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "content": "## Research the job description",
+        "height": 540,
+        "width": 2160,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        280,
+        -100
+      ],
+      "id": "b03100d4-b764-474d-bf68-f7a24c38d52d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Create a proposal\n",
+        "height": 540,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        -100
+      ],
+      "id": "04dcf2b6-a67c-48de-9285-1048704faf92",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Create a mermaid diagram",
+        "height": 540,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3020,
+        -100
+      ],
+      "id": "99eb7938-bdb9-418a-bcda-1d094af2dbec",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Create a document\n",
+        "height": 540,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3560,
+        -100
+      ],
+      "id": "9b1fa210-52bc-418d-a9db-6b22f061d80f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb6907f6-f63e-488d-af95-9545df2d9872",
+              "name": "conclusion",
+              "value": "={{ $json.output.conclusion }}",
+              "type": "string"
+            },
+            {
+              "id": "f8cd4553-70ac-4bcf-aff8-a01e81c70ea7",
+              "name": "application",
+              "value": "={{ $('Step 3: Data Collection').item.json.output.application }}",
+              "type": "string"
+            },
+            {
+              "id": "d0915368-6343-45a9-bea1-bec14c9e049a",
+              "name": "plan",
+              "value": "={{ $('Step 2: Design Research Plan').item.json.output.plan }}",
+              "type": "string"
+            },
+            {
+              "id": "bf381f7a-7c04-420c-b6bc-47c659a59541",
+              "name": "problem",
+              "value": "={{ $('Step 1:  Define the Problem').item.json.output.problem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2560,
+        20
+      ],
+      "id": "c162371c-7f4c-46f3-b64a-52058f4b1a89",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2780,
+        20
+      ],
+      "id": "db257582-ba67-495e-a156-cf9559de49b6",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aa7e7499-7985-44ec-a394-4606adf0900a",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 1:  Define the Problem",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 1:  Define the Problem",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 2: Design Research Plan",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 2: Design Research Plan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1:  Define the Problem": {
+      "main": [
+        [
+          {
+            "node": "Step 2: Design Research Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 3: Data Collection",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2: Design Research Plan": {
+      "main": [
+        [
+          {
+            "node": "Step 3: Data Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "research_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 3: Data Collection",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 3: Data Collection",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 3: Data Collection1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "research_tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 3: Data Collection1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 3: Data Collection1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 3: Data Collection": {
+      "main": [
+        [
+          {
+            "node": "Step 3: Data Collection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 3: Data Collection1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Step 1:  Define the Problem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "97fb7d3a-a253-4ac8-b6fa-22f28bc1b4d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "puLoO4oWvVXuhyUH",
+  "tags": []
+}

@@ -1,0 +1,534 @@
+{
+  "name": "🎨 Art Gen 🤖 HF Cover",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        980,
+        680
+      ],
+      "id": "ce383a24-e5e4-4187-970c-18f433ecffad",
+      "name": "NotionSerper"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the article: {{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are a specialized digital artist, your expertise lies in emulating Shigenori Soejima’s signature style—blending urban fashion, surreal symbolism, and dynamic character designs with a modern-anime aesthetic. You excel at crafting visuals that evoke the series’ themes of identity, duality, and psychological depth.\n\nCore Artistic Values:\n- Sharp, clean linework reminiscent of cel animation\n- Bold color choices with emphasis on red, black, and white as primary palette\n- Dynamic compositions that convey movement and energy\n- Stylized character designs with strong silhouettes\n- Integration of symbolic and metaphysical elements\n\nWorkflow Process:\n1. Article Analysis\n   - Identify key narrative themes and emotional undertones\n   - Extract significant visual metaphors and symbols\n   - Note specific mood indicators and atmosphere descriptors\n   - Map character relationships and dynamics\n\n2. Visual Development\n   - Create cohesive color schemes that reflect psychological themes\n   - Design compositions that emphasize dramatic tension\n   - Incorporate urban environments with supernatural elements\n   - Balance realistic architecture with stylized character art\n\n3. Style Requirements\n   - Maintain smooth gradients and cel-shading techniques\n   - Implement dramatic lighting with strong shadow work\n   - Use geometric patterns and motifs for UI elements\n   - Apply careful edge control and line weight variation\n\nTechnical Specifications:\n- High contrast ratio between elements\n- Clear focal points with supporting compositional flow\n- Depth through atmospheric perspective\n- Minimal texture noise in flat areas\n- Crisp edges on primary shapes\n\nMood Direction:\n- Urban sophistication meets supernatural mystery\n- Youth culture aesthetics with dark undertones\n- Psychological complexity through visual metaphor\n- Balance between realism and stylized anime elements\n\nQuality Control Checklist:\n- Composition maintains clear visual hierarchy\n- Color harmony supports narrative theme\n- Line quality remains consistent throughout\n- Lighting enhances dramatic impact\n- Character proportions follow anime stylization\n- Environmental details support story context\n\nStyle Restrictions:\n- No photorealistic textures\n- Avoid purely mechanical rendering\n- No heavy post-processing effects\n- Clean, definitive shapes over loose sketchy lines\n- No western comic book styling\n- No wrongly spelled texts\n- No watermark/signatures\n\nYou will analyze provided articles through this lens, creating artwork that captures both the visual sophistication and psychological depth characteristic of the Persona series while maintaining technical excellence and artistic coherence.\n\n#Output will be the prompt only. No other texts."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        780,
+        440
+      ],
+      "id": "1fd2b501-5de0-4349-8469-ee1b02b4032c",
+      "name": "Art Prompt Generator",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -100,
+        440
+      ],
+      "id": "9bc72936-5424-4c0c-85c0-41ac5482401c",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## Art Generator\n1. Create a prompt based on provided content \n2. Generate image using Dall-e\n3. Upload the image to baserow so that the link will not expire\n\nWF TUT\nhttps://n8n.io/workflows/2417-flux-ai-image-generator/",
+        "height": 280,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "808c47cc-9a7b-4f35-a013-fae8c0604a50",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86612e12-e2ae-442a-8ec3-6cd4055d25be",
+              "name": "=content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        440
+      ],
+      "id": "4b9ad17d-ef2a-4dee-973f-5e5e5b9ded22",
+      "name": "Set to content"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        780,
+        680
+      ],
+      "id": "25bc38f1-7fdd-421b-aae6-e39da002cd19",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "EId7WN890fo5grDb",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "=Depict {{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "611c45a4-f75e-441d-a735-2f9aaf224548",
+      "name": "Call hugginface inference api1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1200,
+        440
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2YZ4iz6eHMquxX8T",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": " "
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://nftnewstoday.com/feed/"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        280
+      ],
+      "id": "ddbb2ec4-bb82-4ec0-b18b-59f459bff931",
+      "name": "RSS Feed Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1af76e1-6af1-46a4-85b1-75aaef40886c",
+              "name": "=url",
+              "value": "=https://pub-d16d7d90367b44e49faec54388b59854.r2.dev/{{ $json.Key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2420,
+        420
+      ],
+      "id": "c99a7ef0-1a9e-43ba-8f13-9d495d774512",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5fd63acc-4200-4532-995d-76481169bf7b",
+              "name": "",
+              "value": "={{ $('RSS Feed Trigger').item.json.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        120,
+        280
+      ],
+      "id": "7b4cebd9-3890-48e5-8c17-97f070f5acdf",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "aiseo",
+        "fileName": "=fg-{{ $execution.id }}.jpg",
+        "additionalFields": {}
+      },
+      "id": "9d0eff66-6252-4f9b-8e3e-196bed46b692",
+      "name": "Upload image to S",
+      "type": "n8n-nodes-base.s3",
+      "position": [
+        1460,
+        420
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "bucket",
+        "operation": "search",
+        "bucketName": "aiseo",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        420
+      ],
+      "id": "26dbdafc-0e25-499c-ac9d-5f88940928fa",
+      "name": "S3",
+      "credentials": {
+        "s3": {
+          "id": "DtWlVPoqgFkytoR0",
+          "name": "S3 account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "LastModified",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        420
+      ],
+      "id": "1482c330-0965-48e6-b05f-89249603acba",
+      "name": "Sort"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        420
+      ],
+      "id": "6623cebb-3e82-417d-8fad-dc89efd83519",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d4c44b1-fd1b-40a4-8f04-37a059b43045",
+              "leftValue": "={{ $json.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        420,
+        440
+      ],
+      "id": "31a00201-1b00-44bc-88ef-d837604e5426",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "7190215269",
+        "text": "=Null content in Art Gen HF, check workflow.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        940
+      ],
+      "id": "f9ea863f-e64e-4bd8-ba12-bd1cbdd6e9ff",
+      "name": "Telegram1",
+      "webhookId": "0bf8e718-28b2-4628-8fe2-33a63b92554c",
+      "credentials": {
+        "telegramApi": {
+          "id": "OxvwaZH3MHHu1L3e",
+          "name": "Bloggerist"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "NotionSerper": {
+      "ai_tool": [
+        [
+          {
+            "node": "Art Prompt Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Art Prompt Generator": {
+      "main": [
+        [
+          {
+            "node": "Call hugginface inference api1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set to content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set to content": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Art Prompt Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call hugginface inference api1": {
+      "main": [
+        [
+          {
+            "node": "Upload image to S",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call hugginface inference api1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image to S": {
+      "main": [
+        [
+          {
+            "node": "S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S3": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Art Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4a9e1dd-5014-4dff-af24-8cc9755705c4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "2WYFdwPeoDZ4zMgB",
+  "tags": []
+}

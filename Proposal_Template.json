@@ -1,0 +1,384 @@
+{
+  "name": "Proposal Template",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -40,
+        -20
+      ],
+      "id": "eaa2a60f-ea40-48e1-aa9d-9f258a8e5b9f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "CV"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        180
+      ],
+      "id": "cdcdcd43-0aa3-41a8-a20c-ff56c3536052",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "userdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        520,
+        180
+      ],
+      "id": "5332d0b4-2940-42c7-b5ae-9d5e53c106fb",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -260
+      ],
+      "id": "d7e5a583-2c1d-4241-a359-c9a2d766fcf2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## User Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        80
+      ],
+      "id": "258f61f2-2d6a-4bf1-bb91-035a83df9deb",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=You are an AI assistant tasked with creating a high-performing proposal template for an automation specialist applying to jobs on Upwork. You will be provided with a specific job description, and your task is to generate a tailored proposal based on that description.\n\n### Instructions\n\n#### Step 1: Analyze the Job Description provided\n- Extract the key requirements, preferences, and any specific instructions from the provided Upwork job description.\n- Use this information to tailor the proposal, ensuring it directly addresses the client's needs.\n\n#### Step 2: Create the Proposal using user's CV {{ $json.userdata.toJsonString() }}\nGenerate a proposal that includes the following sections:\n\n1. **Introduction**\n   - Create an engaging introduction that grabs the client's attention.\n   - Demonstrate an understanding of the client's needs based on the job description.\n   - Differentiate yourself from other freelancers by highlighting your unique value as an automation specialist.\n\n2. **Summary of Skills and Experience**\n   - Summarize your skills and experience that are most relevant to the job.\n   - Emphasize your expertise in automation and how it can benefit the client (e.g., increased efficiency, cost savings, scalability).\n\n3. **Proposed Solution or Approach**\n   - Outline a proposed solution or approach to the client's problem.\n   - Demonstrate how your automation skills can add value and address the specific requirements of the job.\n\n4. **Call to Action**\n   - Include a strong call to action encouraging the client to hire you.\n\n#### Step 3: Ensure Quality\nThe proposal should meet the following quality standards:\n- **Relevance**: Clearly addresses the client's needs as stated in the job description.\n- **Uniqueness**: Highlights your unique strengths as an automation specialist and the benefits of automation.\n- **Clarity and Engagement**: Uses professional yet engaging language that stands out.\n- **Accuracy**: Is free of grammatical or spelling errors and is easy to read.\n- **Persuasiveness**: Includes a compelling call to action.\n\n#### Step 4: Format the Output using the related template from {{ $json.agentdata.toJsonString() }}\n- The proposal should be professional, concise (no more than 300 words), and persuasive.\n- Generate the proposal in a structured text format, ready to be copied and pasted into the Upwork proposal submission field.\n\n### Context\n- Upwork is a competitive freelance platform where proposals often compete with many others. The proposal should be compelling and differentiate you from other freelancers.\n- As an automation specialist, emphasize how automation can benefit the client, regardless of the specific job requirements. Highlight benefits such as increased efficiency, cost savings, or scalability where relevant to the job description.\n\n#### Rules\n- Write in casual, spartan tone of voice.\n- Don't use emojis or flowery language.\n- If there's a name included in the description, use it in the proposal\n- Use nickname and email for P.S."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1620,
+        -40
+      ],
+      "id": "07567003-baee-45e3-8598-866875ede42b",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        720,
+        40
+      ],
+      "id": "43e53ea0-489a-4750-9f95-d51fe811ac9b",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        260
+      ],
+      "id": "d3547af1-056b-41e0-88bc-62988cefe91a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Freelance Agent"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        300,
+        -180
+      ],
+      "id": "0147eec2-40a5-422e-aeb2-b0acb48dc1a2",
+      "name": "Notion1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "agentdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_context",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        520,
+        -180
+      ],
+      "id": "c5623770-ba33-4e62-b3a0-44060432823b",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        920,
+        -60
+      ],
+      "id": "22ecd3f8-ecde-4f2d-99a3-2b4111cd9c85",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data\nconst items = $input.all();\n\n// Process each item in the input\nconst processedItems = items.map(item => {\n    // Extract the article text (assuming it's in a field called 'articles')\n    const originalText = item.json.query || '';\n\n    // Remove all newline characters (\\n) and quotes (\" and ')\n    const cleanedText = originalText.replace(/[\\n\"']/g, '');\n\n    // Return the modified item with the cleaned text\n    return {\n        ...item,\n        json: {\n            ...item.json,\n            articles: cleanedText, // Update the 'articles' field with the cleaned text\n        },\n    };\n});\n\n// Output the processed items\nreturn processedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        -60
+      ],
+      "id": "3a083cbe-74a0-40ae-9710-19d311ab3a15",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cc383bbe-15cb-4e24-9b85-7152fb3efd81",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "m13lorqZYC2ztjeh",
+  "tags": []
+}

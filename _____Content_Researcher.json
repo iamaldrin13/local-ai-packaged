@@ -1,0 +1,862 @@
+{
+  "name": "🤖🏗️Content Researcher",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Create an article based on the 8 steps of research\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        60
+      ],
+      "id": "85f44c09-0826-4052-a516-28fc511f583b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"Step 1\": \"Define the Article Topic\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        120
+      ],
+      "id": "33641cb5-773f-497e-9a57-4178e3177242",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool for web searches.",
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "X-API-KEY",
+              "valueProvider": "fieldValue",
+              "value": "9511ebe772bc3094c5382c85e5e564c7ae2294ca"
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "q",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        920
+      ],
+      "id": "8f6fb163-c0d0-4e6f-bf54-d3b60b104ee0",
+      "name": "NotionSerper"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -180,
+        220
+      ],
+      "id": "ac210365-6acb-4816-9729-0ab4dc519eac",
+      "name": "When chat message received",
+      "webhookId": "b7b50835-a1f7-4c7a-98ee-8c7461b19fec"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        920
+      ],
+      "id": "18e120ea-a3db-40f3-9e64-d6a644d8e25c",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2JjvM6ZIADQUl0N0",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Content Strategy Specialist with web search capabilities, help me define what my article will be about. Use your search tool to identify trending topics and content gaps in the article provided. Suggest 3-5 specific angles or perspectives, backed by current search trends and audience interest data. For each suggestion, explain why it would engage readers and what unique value it offers. Help me narrow down to the most promising focus. Your expertise should include trend analysis, audience insights, and competitive content assessment to identify the most valuable approach."
+        }
+      },
+      "id": "f59c6451-f70c-4d75-9901-ba20e8f9805b",
+      "name": "Step 1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        0
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an Audience Research Analyst with access to online research tools, based on the article provided, identify the ideal target audience. Use your search capabilities to gather current demographic information, social media conversations, and forum discussions relevant to the topic. Describe their demographics, interests, pain points, and what they're looking for based on real data. Explain how my content should be tailored to meet their specific needs and address their questions. You should analyze market segments, create detailed persona profiles, and provide specific content adaptation strategies for each audience segment."
+        }
+      },
+      "id": "2f0f0c8e-ca88-4d61-9d17-3d0dbb12d7ad",
+      "name": "Step 2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        220
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a SEO Specialist with keyword research tools, research and provide a list of 5-10 SEO keywords relevant to the article provided. Use your search capabilities to gather actual search volume data, competition metrics, and trend information. Include primary keywords, long-tail variations, and semantic terms. Rank them by search volume and competition level. Then, suggest natural ways to incorporate these keywords into my article's title, headings, and body. You should use industry-standard keyword research methodologies and provide competitor keyword analysis based on current SERP results."
+        }
+      },
+      "id": "9d4d1d90-5c69-49d0-add4-dba1ef1626b8",
+      "name": "Step 3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        440
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Content Architect with access to online content analysis tools, create an outline from the topic provided targeting {{ $('Merge').item.json.output['Target Audience'] }}. Use your search capabilities to analyze top-performing content structures in this niche. Include an attention-grabbing introduction, 5 main sections with subheadings, and a compelling conclusion. For each section, provide a brief description of the key points to cover and relevant keywords to incorporate. Your outline should follow proven content structures that maximize reader engagement and retention, based on analysis of successful competitor articles.\nHere is another perspective about the article. \n{{ $json.output['Step 1'] }}"
+        }
+      },
+      "id": "e438362a-ac34-4622-9422-2c9d1c4d1df4",
+      "name": "Step 4",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1240,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When chat message received').item.json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Professional Content Writer with research capabilities, using this outline we've created:  {{ $json.output.toJsonString() }}\n\nWrite a complete draft of the provided article. Use your search tool to verify facts, gather current statistics, and identify authoritative information that strengthens the content. Include an engaging introduction that hooks the reader, well-developed body sections with verified information, and a strong conclusion with a call to action. Maintain a casual degen but professional tone throughout, and naturally incorporate our target keywords. After drafting, review for clarity, flow, and engagement. Your writing should demonstrate expertise in the subject matter while maintaining the appropriate voice for the target audience.\nSeparate it per the outline provided."
+        }
+      },
+      "id": "d6a4917f-6d51-4042-b7f1-f1c916e1ee6e",
+      "name": "Step 5",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1860,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Visual Content Strategist with access to visual trend analysis, based on the article provided, suggest 5 visual elements to enhance it. Use your search capabilities to identify current visual styles, formats, and trends that resonate with the target audience. For each suggestion, provide a detailed prompt for an AI art generator that specifies style, composition, subject matter, mood, lighting, and color palette. Explain how each visual will complement specific sections of my content. Your recommendations should be based from the Memory tool provided, follow visual design principles that enhance content comprehension and emotional impact, informed by current industry visual standards.\nOutput will be 5 different prompts in structured JSON."
+        }
+      },
+      "id": "4b093b4b-062b-44d1-8c83-cffae47fd743",
+      "name": "Step 6",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2360,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Step 5').item.json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a Professional Editor and Content Optimizer with content analysis tools, complete a comprehensive review and edit of provided article. Use your search capabilities to benchmark the content against top-performing articles in the same niche. Check for: sentence structure, clarity of ideas, logical flow between sections, consistent tone, effective keyword usage, proper citations, SEO optimization, and overall engagement. Suggest specific improvements and provide an edited version. Your editing should apply industry best practices for readability, SEO performance, humanize content, and conversion optimization, informed by analysis of successful content in this space.\nClean up all the special characters specially # and *. "
+        }
+      },
+      "id": "0a88949b-6bce-47d4-9432-402fd9ae52ed",
+      "name": "Step 7",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2840,
+        300
+      ],
+      "retryOnFail": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Target Audience\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        340
+      ],
+      "id": "759bcf68-5b36-4380-a574-47c1b25564f3",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"SEO Keywords\": [\"Los Angeles\", \"San Francisco\", \"San Diego\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        560
+      ],
+      "id": "252f1739-bd73-4956-9be5-e8510448ab5b",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Introduction\": \"attention-grabbing introduction\",\n    \"Main sections\": [\"5 main sections with subheadings\"],\n    \"Conclusion\": \"compelling conclusion\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1480,
+        440
+      ],
+      "id": "21a34e65-eee0-4a87-b3d6-0cf76635b9cb",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "content": "## Needs Step 2 and Step 3 results\n\nCreate the outline\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        80
+      ],
+      "id": "9d4f839b-f0ab-409a-9e1d-b35c4c9d7571",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        880,
+        300
+      ],
+      "id": "98b23903-0305-490a-8b0d-7a57a8d2f163",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "## Step 5 needs the article outline from Step 4\n\nWrite the article\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        80
+      ],
+      "id": "fa0af108-45de-49c9-a892-cb240e5b7db8",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Step 1 - Define the Article Topic\nStep 2 - Target Audience\nStep 3 - SEO Keywords"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "387fa01e-092c-40e7-a91e-8a4be9618834",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Section 1\": \"Introduction\",\n\t\"Section 2\": \"Gameplay Mechanics\",\n    \"Section 3\": \"Technical Innovation\",\n    \"Section 4\": \"Community & Economy\",\n    \"Section 5\": \"Future Vision\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2120,
+        440
+      ],
+      "id": "699bae4e-85ae-4a34-978a-e8255ea65f42",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "content": "## Step 6 creates the image prompt based on the article segmentation",
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        80
+      ],
+      "id": "7eac2180-1d23-4818-b190-c9e336c888e0",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Art 1\": \"Prompt 1\",\n\t\"Art 2\": \"Prompt 2\",\n    \"Art 3\": \"Prompt 3\",\n    \"Art 4\": \"Prompt 4\",\n    \"Art 5\": \"Prompt 5\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2620,
+        440
+      ],
+      "id": "ff8aab2c-d3da-497a-8a99-a053b6dc957c",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "content": "## Step 7 Final Review",
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2840,
+        80
+      ],
+      "id": "653a1ec6-dad6-4e2a-8fe4-2b75a17e559c",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Revised Section 1\": \"Introduction\",\n\t\"Revised Section 2\": \"Gameplay Mechanics\",\n    \"Revised Section 3\": \"Technical Innovation\",\n    \"Revised Section 4\": \"Community & Economy\",\n    \"Revised Section 5\": \"Future Vision\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3120,
+        560
+      ],
+      "id": "ca530c2c-8b91-4ff3-88e7-172dda6756eb",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        80
+      ],
+      "id": "14a6ac71-f562-410d-8748-65d5e1fd2b40",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Memory tool for creating art prompts",
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Art"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        2460,
+        700
+      ],
+      "id": "1b827b4d-0ea4-4aad-a236-56f40bc36dd6",
+      "name": "Memory Tool",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "19ea83da-9783-80b5-8058-cdd81ef85b84",
+          "mode": "list",
+          "cachedResultName": "AI Research",
+          "cachedResultUrl": "https://www.notion.so/19ea83da978380b58058cdd81ef85b84"
+        },
+        "title": "OpenSea Suspends XP Rewards: Community Reactions and Future Outlook",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Art Prompt 1|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 1'] }}"
+            },
+            {
+              "key": "Art Prompt 2|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 2'] }}"
+            },
+            {
+              "key": "Art Prompt 3|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 3'] }}"
+            },
+            {
+              "key": "Art Prompt 4|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 4'] }}"
+            },
+            {
+              "key": "Art Prompt 5|rich_text",
+              "textContent": "={{ $('Step 6').item.json.output['Art 5'] }}"
+            },
+            {
+              "key": "Section 1|rich_text",
+              "textContent": "={{ $json.output['Revised Section 1'] }}"
+            },
+            {
+              "key": "Art Prompt 2|rich_text",
+              "textContent": "={{ $json.output['Revised Section 2'] }}"
+            },
+            {
+              "key": "Section 3|rich_text",
+              "textContent": "={{ $json.output['Revised Section 3'] }}"
+            },
+            {
+              "key": "Art Prompt 4|rich_text",
+              "textContent": "={{ $json.output['Revised Section 4'] }}"
+            },
+            {
+              "key": "Art Prompt 5|rich_text",
+              "textContent": "={{ $json.output['Revised Section 5'] }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.output['Revised Section 1'] }}"
+            },
+            {
+              "textContent": "={{ $json.output['Revised Section 2'] }}"
+            },
+            {
+              "textContent": "={{ $json.output['Revised Section 3'] }}"
+            },
+            {
+              "textContent": "={{ $json.output['Revised Section 4'] }}"
+            },
+            {
+              "textContent": "={{ $json.output['Revised Section 5'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        3200,
+        300
+      ],
+      "id": "0e5c129f-eacc-4897-9fc5-ad082e38149f",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "In Progress. \nTODO\nFix Step 6\nUpload to notion"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3980,
+        240
+      ],
+      "id": "18331972-b8d5-4f7f-85e0-231efb02bfe7",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionSerper": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 3",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 4",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 6",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Step 7",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Step 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Step 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Step 1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 2",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 3",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 4",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 5",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 6",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Step 7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Step 4": {
+      "main": [
+        [
+          {
+            "node": "Step 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 5": {
+      "main": [
+        [
+          {
+            "node": "Step 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 6": {
+      "main": [
+        [
+          {
+            "node": "Step 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 7": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 3",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 4",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 5",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 6",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Step 7",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Step 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Step 6",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "22349608-9097-44a2-9d91-24b5024b0f55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "7obgQuT9sF1WvmlO",
+  "tags": []
+}

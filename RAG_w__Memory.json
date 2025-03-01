@@ -1,0 +1,1271 @@
+{
+  "name": "RAG w/ Memory",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=# ROLE\nYou are a friendly AI assistant.\nYou are currently talking to Leon.\n\n# RULES\nWhen a user sends a new message, decide if the user provided any noteworthy information that should be stored in memory. If so, call the Save Memory tool to store this information in memory. DO NOT inform the user that this information was stored in memory.  Simply continue to answer the question or executing the next tasks.\n\n# Tools\n## Save Memory\nUse this tool to store information about the user. Extract and summarize interesting information from the user message and pass it to this tool.\n\n# Memories\nHere are the last noteworthy memories that you've collected from the user, including the date and time this information was collected.\n!! IMPORTANT!\nThink carefully about your responses and take the user's preferences into account!\nAlso consider the date and time that a memory was shared in order to respond with the most up to date information.\n\n{{ $('Aggregate1').first().json.data }}\n\nPrompt: {{ $json.chatInput }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        300,
+        1060
+      ],
+      "id": "fb985e7a-9f2e-43fc-b05a-fb710f57cc0f",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        380,
+        1400
+      ],
+      "id": "e588c122-1d93-41cc-bbde-90d6be71953b",
+      "name": "Window Buffer Memory1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93bf9bac-d06c-4a63-a92d-9a474fd7148e",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -540,
+        940
+      ],
+      "id": "8a1a0b39-0807-4d43-8dec-593176484747",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43197a3b-a218-415c-acdf-5b7c90fd0579",
+              "leftValue": "={{ $('Telegram Trigger1').item.json.message.voice.file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1160,
+        1040
+      ],
+      "id": "0f119a52-89f1-4565-82da-3bb446e14c63",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $('AI Agent1').item.json.output }}",
+        "voice": "nova",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        520,
+        920
+      ],
+      "id": "a5b2a821-1b62-4df3-b36b-9f9b25155b29",
+      "name": "OpenAI1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        860,
+        920
+      ],
+      "id": "88154888-61dd-42af-b5f6-4f3ca6397033",
+      "name": "Reply with audio1",
+      "webhookId": "fea0856c-a8d2-459e-86a3-05e53a7a036c"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1620,
+        1020
+      ],
+      "id": "02ccfe50-5ffc-467c-98b4-797c7a07f7a2",
+      "name": "Reply with text1",
+      "webhookId": "1460da0a-0337-4986-8498-0e3ae024b712"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        220,
+        1540
+      ],
+      "id": "f5d74df6-6b54-414c-9972-d6ca2806a8e6",
+      "name": "Groq Chat Model1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        1360
+      ],
+      "id": "a0b6e137-fb18-43b5-8dcd-f01a616cb8dd",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "key": "Memory Date|date",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -760,
+        1260
+      ],
+      "id": "ecfe29f9-02ad-45b3-9498-0e554f154171",
+      "name": "Notion2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date, property_type",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        1260
+      ],
+      "id": "7e123fff-d04c-45f9-8b02-93a9cbfe974d",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        1040
+      ],
+      "id": "610a36f0-61b9-486a-8af6-65c5c1b417b2",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3120,
+        800
+      ],
+      "id": "47cdec3a-f104-4691-a37b-eb3907a333ad",
+      "name": "When chat message received",
+      "webhookId": "ed447f86-231c-4a58-ab13-c9cb9d5c1b89"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "title": "={{ $fromAI('Memory') }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Type|select",
+              "selectValue": "={{ $fromAI('Type', 'if user or agent') }}"
+            },
+            {
+              "key": "Context|rich_text",
+              "textContent": "={{ $fromAI('Context', 'why it needs to be stored') }}"
+            },
+            {
+              "key": "Memory Date|date",
+              "includeTime": false,
+              "date": "={{ $now }}",
+              "timezone": "Asia/Manila"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1680,
+        1060
+      ],
+      "id": "84f9aa42-020f-4baa-bca9-0e7e9e4fd379",
+      "name": "Memory tool",
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -180,
+        1560
+      ],
+      "id": "5f5c9191-c3b0-46ac-aa36-a21e4805beea",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        1760
+      ],
+      "id": "845674ed-9c24-4c0a-a321-2365d20a9ba5",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appdddaMGxCosxx2S",
+          "mode": "list",
+          "cachedResultName": "Memory",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUG1b1Zh1FVr8Am",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S/tblUG1b1Zh1FVr8Am"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Memory": "={{ $fromAI('memory', 'summary of memory') }}",
+            "User": "={{ $fromAI('type', 'determines if the memory is for the user or agent') }}",
+            "Context": "={{ $fromAI('context', 'reason for storing memory') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Memory",
+              "displayName": "Memory",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "User",
+              "displayName": "User",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created time",
+              "displayName": "Created time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        320
+      ],
+      "id": "1beddefa-9667-40bb-9a29-025cb7bc2c06",
+      "name": "Save Memory"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appdddaMGxCosxx2S",
+          "mode": "list",
+          "cachedResultName": "Memory",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUG1b1Zh1FVr8Am",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S/tblUG1b1Zh1FVr8Am"
+        },
+        "options": {
+          "fields": [
+            "Memory"
+          ]
+        },
+        "sort": {
+          "property": [
+            {
+              "field": "Created time"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        120
+      ],
+      "id": "e6cc2003-0602-42db-9797-20a7c736ec93",
+      "name": "Get Memories",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "memories",
+        "include": "specifiedFields",
+        "fieldsToInclude": "createdTime, Memory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        120
+      ],
+      "id": "b19401b0-68c1-4992-9b31-991d6e0bb73c",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6ac8ba70-7681-4b4e-b7cd-e962f8001309",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').first().json.sessionId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        260,
+        320
+      ],
+      "id": "7a968696-5610-428c-9903-6999d8c8e461",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Merge').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a helpful AI assistant with access to a memory storage system and other tools.\n\n# RULES\nWhen a user sends a new message, decide if the user provided any noteworthy information that should be stored in memory. Categorize the memory if it's data for user or agent. If so, call the Save Memory tool to store this information in memory. DO NOT inform the user that this information was stored in memory.  Simply continue to answer the question or executing the next tasks.\n\n## Operating Instructions\n\n### Processing Input\n1. First, review all provided memory data here for user \"{{ $json.memories.toJsonString() }}\"\n2. Second, review all provided memory data here for assistant \"{{ $json.memories.toJsonString() }}\"\n3. Then, process the user's query using both:\n   - Your base knowledge\n   - The provided memory data\n\n### Memory Storage Decision Process\nAfter generating your response, follow these steps:\n\n1. Evaluate if the information in your response should be stored by asking:\n   - Is this information likely to be relevant for future interactions?\n   - Does it contain important facts about the user or the conversation?\n   - Will this knowledge improve future responses?\n\n2. If storage is warranted, determine the appropriate category:\n   - \"User\": For information about the user's:\n     - Preferences\n     - Personal details\n     - Past interactions\n     - Specific requests or needs\n   \n   - \"Agent\": For information about:\n     - Your own capabilities\n     - Previous responses\n     - Learned patterns\n     - Operational decisions\n\n3. Create the memory entry using the specified format\n\n### Response Format\nStructure your responses as follows:\n\n```\n[Response to user query]\n\nMemory Management:\nStorage Decision: [Store/Don't Store]\nReasoning: [Brief explanation of your decision]\n\nIf storing:\nNew Memory Entry:\n{\n    \"memory\": \"[Information to store]\",\n    \"category\": \"[User/Agent]\",\n    \"timestamp\": \"[Current timestamp]\",\n    \"context\": \"[Relevant context]\"\n}\n```\n\n## Example\n\nUser Memory Data:\n```\n{\n    \"memory\": \"User prefers detailed technical explanations\",\n    \"category\": \"User\",\n    \"timestamp\": \"2024-02-17 10:00:00\",\n    \"context\": \"From previous conversation about programming\"\n}\n```\n\nQuery: \"Can you explain how databases work?\"\n\nResponse:\n```\n[Detailed technical explanation of databases...]\n\nMemory Management:\nStorage Decision: Store\nReasoning: User engaged with technical content, confirms previous preference pattern\n\nNew Memory Entry:\n{\n    \"memory\": \"User showed interest in database systems and architecture\",\n    \"category\": \"User\",\n    \"timestamp\": \"2024-02-17 10:15:00\",\n    \"context\": \"Follow-up to technical preferences pattern\"\n}\n```\n# Tools\n## Save Memory\nUse this tool to store information about the user or agent. Extract and summarize interesting information from the user message and pass it to this tool.\n\n# Memories\nHere are the last noteworthy memories that you've collected from the user, including the date and time this information was collected.\n!! IMPORTANT!\nThink carefully about your responses and take the user's preferences into account!\nAlso consider the date and time that a memory was shared in order to respond with the most up to date information."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        700,
+        0
+      ],
+      "id": "ed7b1a36-76be-40de-89a9-5114f29720f7",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        320
+      ],
+      "id": "fd0516f5-0e28-48ed-891d-798d0635d9aa",
+      "name": "OpenAI Chat Model2"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appdddaMGxCosxx2S",
+          "mode": "list",
+          "cachedResultName": "Memory",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUG1b1Zh1FVr8Am",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S/tblUG1b1Zh1FVr8Am"
+        },
+        "filterByFormula": "({User} = 'Agent')",
+        "options": {
+          "fields": [
+            "Memory"
+          ]
+        },
+        "sort": {
+          "property": [
+            {
+              "field": "Created time"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "id": "b2324159-f25d-48d8-a3fc-6402913691a6",
+      "name": "Get Memories1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "memories",
+        "include": "specifiedFields",
+        "fieldsToInclude": "createdTime, Memory",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        420,
+        0
+      ],
+      "id": "936636f4-97ef-48e3-9590-c61f508f973b",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "User"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -2820,
+        980
+      ],
+      "id": "9853c5d9-3498-4a2c-8672-be68bab493d8",
+      "name": "Notion",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "userdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2600,
+        980
+      ],
+      "id": "e54753d2-0f01-460c-9b5b-f4ab9ac83e30",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2880,
+        540
+      ],
+      "id": "04c06358-aea1-4459-95c9-e37372b4058a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## User Memories\n",
+        "height": 280,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2880,
+        880
+      ],
+      "id": "d5e16ce2-8e5e-4aff-89c2-8948c8336fd9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appdddaMGxCosxx2S",
+          "mode": "list",
+          "cachedResultName": "Memory",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUG1b1Zh1FVr8Am",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appdddaMGxCosxx2S/tblUG1b1Zh1FVr8Am"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Memory": "={{ $fromAI('memory', 'summary of memory') }}",
+            "User": "={{ $fromAI('type', 'determines if the memory is for the user or agent') }}",
+            "Context": "={{ $fromAI('context', 'reason for storing memory') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Memory",
+              "displayName": "Memory",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "User",
+              "displayName": "User",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created time",
+              "displayName": "Created time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -40,
+        540
+      ],
+      "id": "1f7e1c3d-d466-4871-b1d0-360beb026f34",
+      "name": "Save Memory1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').first().json.sessionId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        1060
+      ],
+      "id": "39df172f-c4cc-4d4e-9418-eac4da62d4ec",
+      "name": "Window Buffer Memory2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=You are a helpful AI assistant with access to a memory storage system and other tools.\n\n# RULES\nWhen a user sends a new message, decide if the user provided any noteworthy information that should be stored in memory. Categorize the memory if it's data for user or agent. If so, call the Save Memory tool to store this information in memory. DO NOT inform the user that this information was stored in memory.  Simply continue to answer the question or executing the next tasks.\n\n## Operating Instructions\n\n### Processing Input\n1. First, review all provided memory data here for user \"{{ $json.userdata.toJsonString()  }}\"\n2. Second, review all provided memory data here for assistant \"{{ $json.agentdata.toJsonString() }}\"\n3. Then, process the user's query using both:\n   - Your base knowledge\n   - The provided memory data\n\n### Memory Storage Decision Process\nAfter generating your response, follow these steps:\n\n1. Evaluate if the information in your response should be stored by asking:\n   - Is this information likely to be relevant for future interactions?\n   - Does it contain important facts about the user or the conversation?\n   - Will this knowledge improve future responses?\n   \n2. If storage is warranted, determine the appropriate category:\n   - \"User\": For information about the user's:\n     - Preferences\n     - Personal details\n     - Past interactions\n     - Specific requests or needs\n   \n   - \"Agent\": For information about:\n     - Your own capabilities\n     - Previous responses\n     - Learned patterns\n     - Operational decisions\n\n3. Create the memory entry using the specified format\n\n### Response Format\nStructure your responses as follows:\n\n```\nResponse to user query\n\n```\n\n## Example\n\nQuery: \"Can you explain how databases work?\"\n\nResponse:\n```\nDetailed technical explanation of databases...\n\n```\n# Tools\n## Save Memory\nUse this tool to store information about the user or agent. Extract and summarize interesting information from the user message and pass it to this tool.\n\n# Memories\nHere are the last noteworthy memories that you've collected from the user, including the date and time this information was collected.\n!! IMPORTANT!\nThink carefully about your responses and take the user's preferences into account!\nAlso consider the date and time that a memory was shared in order to respond with the most up to date information. Do not notify the user about storing memory, just store it if you deem fit."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1940,
+        760
+      ],
+      "id": "4e03c755-d784-4983-868f-8e9da9b8309d",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        700
+      ],
+      "id": "110386d0-0926-4341-aed9-9b9b873cae5d",
+      "name": "OpenAI Chat Model3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -2400,
+        840
+      ],
+      "id": "1dc60f6c-20a6-41e2-b652-ded46e59ef2a",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        1060
+      ],
+      "id": "b02f5925-30e8-4ff6-a386-b2982bd88569",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "oSYye69ii3FCMtuL",
+          "name": "OpenRouter Ligaya"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "19da83da-9783-80c6-ad1f-ff9b6fdd750e",
+          "mode": "list",
+          "cachedResultName": "AI Memory",
+          "cachedResultUrl": "https://www.notion.so/19da83da978380c6ad1fff9b6fdd750e"
+        },
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Type|select",
+              "condition": "equals",
+              "selectValue": "Agent"
+            }
+          ]
+        },
+        "options": {
+          "sort": {
+            "sortValue": [
+              {
+                "timestamp": true,
+                "key": "last_edited_time",
+                "direction": "descending"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -2820,
+        620
+      ],
+      "id": "038e7166-ab57-4770-bd4a-2893bea46bcb",
+      "name": "Notion1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "notionApi": {
+          "id": "rt5QkWrA48cLvc6K",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "agentdata",
+        "include": "specifiedFields",
+        "fieldsToInclude": "property_memory, property_memory_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2600,
+        620
+      ],
+      "id": "fc0b1c0e-1dc3-498e-95b7-27ac85c8f660",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -2200,
+        740
+      ],
+      "id": "cb8854ff-4e8f-45b6-9e26-6bad502b521a",
+      "name": "Merge3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply with text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Reply with audio1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notion1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Memory": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Memories": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Get Memories1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Memories1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5b89099f-7637-4698-8b51-48a447627732",
+  "meta": {
+    "instanceId": "1215245b40594561d8f4bda0a76d45f647a880b9614bb630d4000d6c8d5649fe"
+  },
+  "id": "D39cJjPWn3PvBqMI",
+  "tags": []
+}
